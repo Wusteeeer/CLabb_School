@@ -51,6 +51,36 @@ void HelloWorld(){
     printf("Hello World");
 }
 
+
+int* padding(int size, int amountOfZeros, int* ptr){
+    
+
+    for (int i = 0; i < size; i++)
+    {
+
+        //TODO: Move everything back and add the zeros after, because if the amount of zeros is less than the size
+        //Then the array gets messed up. Check noteblock
+        ptr = (int*)realloc(ptr, 1);
+        ptr[(size - 1)] = ptr[i];
+
+
+
+    }
+    
+    for (int i = 0; i < amountOfZeros; i++)
+    {   
+
+        size++;
+
+
+        ptr[i] = 0;
+
+
+    }
+
+    return ptr;
+
+}
 static int *binary = NULL;
 
 int* decimalToBinary(int deci, int isSigned){
@@ -102,55 +132,23 @@ int* decimalToBinary(int deci, int isSigned){
    
     }
 
-    int additionalZero = 1;
-    static int startingLength = 0;
     binary = reverse(binary, iter - 1);
 
     if( isSigned == 1 ){
 
+        int res = ceil((float)(iter - 1) / (float)8);
+        printf("iter is: %d, iter - 1 / 8 is: %d\n", iter, res);
 
-        startingLength = iter;
+        int additionalZeros = abs((iter - 1) - (res * 8));
 
-        printf("Size of iter is: %d\n", iter);
+        printf("Your additional zero number is: %d\n", additionalZeros);
+        binary = padding(iter, additionalZeros, binary);
 
-        /*if( iter - 1 < 8 ){
-
-            additionalZero = 8 - (iter - 1);
-
-        }else{
-
-            additionalZero = iter % 8;
-
-        }*/
-
-        printf("Additional zero is: %d\n", additionalZero);
-
-        //TODO: iter needs to be increased to the correct multiple of 8
-        iter += iter - 1 < 8 ? ((8 - (iter - 1))) : ((iter - 1) % 8); 
-
-        printf("Size of binary is: %d\n", iter);
-
-        //Reallocates the needed memory
-        binary = (int*)realloc(binary, iter);
-
-        for (int i = 0; i < additionalZero + startingLength; i++)
-        {
-
-            binary[i + startingLength] = 0;
-            printf("%d, %d\n", binary[i], additionalZero + startingLength);
-
-            //binary[i] = 0;
-
-            //printf("Added 0 to position: %d, And the value: %d\n", i, binary[i]);
-        }
-
-
-    }
-
+        iter += additionalZeros;
    
 
-
-    printf("Your binary number is:\n");
+    }
+    printf("Your binary number is:\n", iter);
 
     for (int i = 0; i < iter - 1; i++)
     {
@@ -175,7 +173,7 @@ int main()
 
     //HelloWorld();
 
-    int* bin = decimalToBinary( 2, 1 );
+    int* bin = decimalToBinary( 65, 1 );
 
     //https://www.scaler.com/topics/length-of-an-array-in-c/
     /*int bin_length = (*(&bin + 1) - bin) * -1;

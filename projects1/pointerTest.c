@@ -30,28 +30,52 @@ int* reverse(int arr[], int size){
 int main(){
 
     int* ptr;
+    int size = 0;
 
     ptr = (int*)calloc(3, sizeof(int));
 
+    size += 3;
     ptr[0] = 1;
     ptr[1] = 2;
     ptr[2] = 3;
 
 
-    for (int i = 0; i < 3; i++)
+    /*for (int i = 0; i < 3; i++)
     {
         printf("%d\n", ptr[i]);
     }
 
     ptr = (int*)realloc(ptr, 1);
+    size += 1;
 
     ptr[3] = 19;
     for (int i = 0; i < 4; i++)
     {
         printf("%d\n", ptr[i]);
+    }*/
+
+
+    ptr = (int*)realloc(ptr, 1);
+    size++;
+    ptr[3] = 19;
+
+    for (int i = 0; i < 4; i++)
+    {   
+
+        ptr = (int*)realloc(ptr, 1);
+        size++;
+
+        ptr[(size - 1)] = ptr[i];
+
+        ptr[i] = 0;
+
+
+    }    
+    
+    for (int i = 0; i < size; i++)
+    {
+        printf("%d\n", ptr[i]);
     }
-
-
     
 
     return 0;
