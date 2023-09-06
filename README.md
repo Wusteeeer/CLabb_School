@@ -1,1 +1,1 @@
-Hello `World`
+General scripts for `school projects`
