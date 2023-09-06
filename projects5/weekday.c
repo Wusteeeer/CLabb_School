@@ -3,16 +3,21 @@
 
 int main(){
 
+
     int currWeekDay = 0, calcWeekDay = 0, dayAmount = 0;
 
+    //Takes input from user
     printf("Vilken dag ar det idag (1-man, 2-tis, ..., 7-son): ");
     scanf("%d", &currWeekDay);
     printf("Ange antal dagar: ");
     scanf("%d", &dayAmount);
 
-    
-    calcWeekDay = (dayAmount + currWeekDay) % 7;    
+    //Calculations
+    calcWeekDay = (dayAmount + currWeekDay) % 7;   
+
+    //Prints the results 
     printf("Om %d dagar ar det ", dayAmount);
+
     switch(calcWeekDay){
         case 0:
 
