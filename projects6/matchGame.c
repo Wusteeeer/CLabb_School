@@ -32,7 +32,6 @@ int main(){
 
         }else{
 
-
             pickedAmount = matchAmount % 4 == 0 ? 1 : matchAmount % 4;
         }
 

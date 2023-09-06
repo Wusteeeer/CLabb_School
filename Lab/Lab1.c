@@ -1,17 +1,11 @@
 #include <stdio.h>
 
 
-float calcVelocity(float pVel, float throttle){
-    return pVel + ((0.1f * throttle) - 1.5f);
-}
+float calcVelocity(float pVel, float throttle);
 
-float calcHeight(float pHeight, float throttle, float vel){
-    return (pHeight + vel) + (((throttle * 0.1f) - 1.5f) / 2.0f);
-}
+float calcHeight(float pHeight, float throttle, float vel);
 
-float calcFuel(float pFuel, float throttle){
-    return pFuel - throttle;
-}
+float calcFuel(float pFuel, float throttle);
 
 void init(){
     printf("Lunar decent challange!\n");
@@ -51,9 +45,28 @@ int main(){
         printf("FAILED! Crash landing at %.1fm/s", velocity);
         return 0;
     }
+    
+    if(fuel <= 0){
+        printf("FAILED! you have no more fuel and crashed with a speed of %.1fm/s onto the moon", velocity);
+        return 0;
+    }
 
 
     printf("CONGRATULATIONS! You landed on the moon successfully!");
     
     return 0;
 }
+
+
+float calcFuel(float pFuel, float throttle){
+    return pFuel - throttle;
+}
+
+float calcHeight(float pHeight, float throttle, float vel){
+    return (pHeight + vel) + (((throttle * 0.1f) - 1.5f) / 2.0f);
+}
+
+float calcVelocity(float pVel, float throttle){
+    return pVel + ((0.1f * throttle) - 1.5f);
+}
+
