@@ -1,0 +1,10 @@
+To push:
+
+git add . (or dir)
+git commit -m "comment"
+git push
+
+
+To fetch:
+
+git pull

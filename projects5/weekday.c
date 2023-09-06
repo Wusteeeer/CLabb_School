@@ -14,27 +14,42 @@ int main(){
     calcWeekDay = (dayAmount + currWeekDay) % 7;    
     printf("Om %d dagar ar det ", dayAmount);
     switch(calcWeekDay){
+        case 0:
+
+            printf("Sondag");
+
+        break;
         case 1:
-        printf("Mandag");
+
+            printf("Mandag");
+            
         break;
         case 2:
-        printf("Tisdag");
+
+            printf("Tisdag");
+            
         break;
         case 3:
-        printf("Onsdag");
+
+            printf("Onsdag");
+
         break;
         case 4:
-        printf("Torsdag");
+
+            printf("Torsdag");
+            
         break;
         case 5:
-        printf("Fredag");
+
+            printf("Fredag");
+
         break;
         case 6:
-        printf("Lordag");
+
+            printf("Lordag");
+
         break;
-        case 0:
-        printf("Sondag");
-        break;
+
     }
 
 
