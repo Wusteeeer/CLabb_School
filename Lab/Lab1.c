@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-
 float calcVelocity(float pVel, float throttle);
 
 float calcHeight(float pHeight, float throttle, float vel);
