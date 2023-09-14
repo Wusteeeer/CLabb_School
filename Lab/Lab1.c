@@ -7,6 +7,8 @@ float calcHeight(float pHeight, float throttle, float vel);
 float calcFuel(float pFuel, float throttle);
 
 void init(){
+
+    printf("\n");
     printf("Lunar decent challange!\n");
     printf("You will pilot a lunar decent the last 250m.\n");
     printf("Each turn represents 1-second decent time.\n");

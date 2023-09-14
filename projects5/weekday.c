@@ -12,7 +12,8 @@ int main(){
     printf("Ange antal dagar: ");
     scanf("%d", &dayAmount);
 
-    //Calculations
+    //Calculations. Ex: It it is Wed (3) we want to check what day it is tomorrow (1) then we would take:
+    //1 + 3 = 4 => 4 % 7 = 4 or Thu (4)
     calcWeekDay = (dayAmount + currWeekDay) % 7;   
 
     //Prints the results 
