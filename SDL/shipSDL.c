@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "rocketMath.h"
 
 float calcVelocity(float pVel, float throttle);
 

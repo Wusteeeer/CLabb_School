@@ -11,7 +11,7 @@ int main(){
 
     srand(time(NULL));
     int arr[LENGTH] = {0};
-
+    
     declareArr(arr, LENGTH);
     sortArr(arr, LENGTH);
     printArr(arr, LENGTH);

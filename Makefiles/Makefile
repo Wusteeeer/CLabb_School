@@ -1,26 +1,22 @@
 
+CC = gcc
+CFLAGS = -I.
+DEPS = testH.h
+OBJ = makeTest.o testC.o
 
-.PHONY : all clean
+all : generate clean
 
-LINKERFLAG = -lm
+#$@ is the left side of the :
+#$^ is all dependencies on the right side and $< is the first dependency in the dependency list
+%.o : %.c ${DEPS}
+	${CC} -c -o $@ $< ${CFLAGS}
 
-CC := gcc
-SRCS := makeTest.c testC.c testH.h.gch
-BINS := $(SRCS:%.c=%)
-
-
-all : ${BINS}
-
-%: %.o
-	@echo "Checking..."
-	${CC} ${LINKERFLAG} $< -o $@
+generate : ${OBJ}
+	${CC} -o $@ $^ ${CFLAGS}
 
 
-%.o:%.c
-	@echo "Creating Object..."
-	${CC} -c $<
-
+.PHONY : clean
 
 clean:
-	@echo "Cleaning up.."
-	rm -rvf *.o ${BINS}
+	rm generate
+
