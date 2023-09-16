@@ -59,6 +59,10 @@
   "C_Cpp.errorSquiggles": "disabled",
   "files.associations": {
     "stdlib.h": "c",
-    "sdl_ttf.h": "c"
+    "sdl_ttf.h": "c",
+    "sdl.h": "c",
+    "lab2lib.h": "c",
+    "cmath": "c",
+    "ship.h": "c"
   }
 }
