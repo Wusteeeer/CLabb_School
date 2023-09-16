@@ -1,15 +1,18 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
 #include <stdlib.h>
 #include "Ship.h"
-
+#include "asteroid.h"
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
+void asteroidHandler(Asteroid *asteroid, SDL_Renderer *renderer, int windowW, int windowH);
 
 int main(int argv, char** args)
 {      
 
+    srand(1);
     int windowH = 700, windowW = 900;
 
     #pragma region SDL_Init
@@ -35,11 +38,28 @@ int main(int argv, char** args)
 
     bool isRunning = true;
 
+    //TODO: Make asteroids spawn outside and fly in
+    //If they leave the screen, make them respawn on a delay
+    //Make the player die if he touches any of them.
+    int randX = rand() % (windowW / 2) + 50;
+    int randY = rand() % (windowH / 2) + 50;
+    int randAngle = rand() % 360;
+    Asteroid* asteroid = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
+
+    srand(2);
+    randX = (windowW / 2) + 50;
+    randY = rand() % 200;
+    randAngle = rand() % 360;
+    Asteroid* asteroid2 = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
+
+    srand(3);
+    randX = (windowW / 2) + 50;
+    randY = (windowH / 2) + 50;
+    randAngle = rand() % 360;
+    Asteroid* asteroid3 = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
 
     do
     {
-
-        
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -66,10 +86,15 @@ int main(int argv, char** args)
         }
         
 
-        
+        //"Draw loop"
         SDL_RenderClear(renderer);
 
+                
         shipHandler(ship, renderer, acc, friction);
+
+        asteroidHandler(asteroid, renderer, windowW, windowH);
+        asteroidHandler(asteroid2, renderer, windowW, windowH);
+        asteroidHandler(asteroid3, renderer, windowW, windowH);
 
         SDL_RenderPresent(renderer);
 
@@ -112,7 +137,7 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
 
 
 
-    SDL_RenderClear(renderer);
+    // SDL_RenderClear(renderer);
 
     drawShip(ship, renderer);
 
@@ -121,6 +146,20 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
 
     drawShip(ship, renderer);
 
-    SDL_RenderPresent(renderer);
+    // SDL_RenderPresent(renderer);
+
+}
+
+
+void asteroidHandler(Asteroid *asteroid, SDL_Renderer *renderer, int windowW, int windowH)
+{
+
+    drawAsteroid(asteroid, renderer);
+
+    moveAsteroid(asteroid);
+    updateAsteroid(asteroid);
+
+    drawAsteroid(asteroid, renderer);
+
 
 }

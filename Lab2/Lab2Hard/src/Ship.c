@@ -5,17 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include <time.h>
 #include "Ship.h"
+#include "labMath.h"
 #define NO_STDIO_REDIRECT
-
-double *calcVectFromAngle(double angle){
-
-    double *dir = malloc(sizeof(double) * 2);
-    dir[0] = cos(angle * 0.017453f);
-    dir[1] = sin(angle * 0.017453f);
-
-    return dir;
-
-}
 
 
 struct ship{
@@ -94,6 +85,7 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
 
 //Allowes us to draw with rotation (and also a texture)
 void drawShip(Ship *ship, SDL_Renderer *renderer){
+    
 
     SDL_RenderCopyEx(renderer, ship->shipTexture, NULL, &(ship->shipRect), ship->angle, NULL, SDL_FLIP_NONE);
 }

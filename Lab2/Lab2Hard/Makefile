@@ -1,34 +1,43 @@
-#If more files are created then add them as objects and C-files here
-OBJ = Lab2HardV.o Ship.o
-FILES = Lab2HardV.c Ship.c
-
-#Add dependencies here (custom made header files)
-DEPS = Ship.h
-
-SRCDIR =.
+SRCDIR =./src
+INCDIR =./include
 
 CC = gcc
 
-INCLUDE = C:\msys64\mingw64\include
-CFLAGS = -g -I${INCLUDE} -c
+
+#TODO: It cannot find the asteroid file for some reason (i think)
+
+#If more files are created then add them as objects and C-files here
+OBJ = Lab2HardV.o Ship.o asteroid.o labMath.o
+
+INCLUDE = -IC:\msys64\mingw64\include -I${INCDIR}
+
+CFLAGS = -g ${INCLUDE} -c
 
 #These are used to make certain SDL libs work - order matters!
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lm
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -mwindows -lm
 
 Lab2HV : ${OBJ}
 
 	@echo "Building Lab2"
+	@${CC} -o $@ $^ ${LDFLAGS}
 
-	@${CC} ${CFLAGS} ${SRCDIR}/${FILES}
+# %.o : ${SRCDIR}/%.c ${INCDIR}/%.h
+# 	${CC} ${CFLAGS} ${SRCDIR}/%.c
+
+Lab2HardV.o : ${SRCDIR}/Lab2HardV.c ${INCDIR}/Ship.h ${INCDIR}/asteroid.h
+	@${CC} ${CFLAGS} ${SRCDIR}/Lab2HardV.c
+
+
+Ship.o : ${SRCDIR}/Ship.c ${INCDIR}/Ship.h ${INCDIR}/labMath.h
+	@${CC} ${CFLAGS} ${SRCDIR}/Ship.c
+
+
+asteroid.o : ${SRCDIR}/asteroid.c ${INCDIR}/asteroid.h ${INCDIR}/labMath.h
+	@${CC} ${CFLAGS} ${SRCDIR}/asteroid.c
+
+labMath.o : ${SRCDIR}/labMath.c ${INCDIR}/labMath.h
+	@${CC} ${CFLAGS} ${SRCDIR}/labMath.c
 	
-	@${CC} $^ -o $@ ${LDFLAGS}
-
-
-#Updates all object files (and therefore also recompiles the C-files) if needed
-%.o : %.c ${DEPS}
-	@${CC} -c -o $@ $< ${CFLAGS}
-
-
 .PHONY : clean
 
 clean:

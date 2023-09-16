@@ -63,6 +63,7 @@
     "sdl.h": "c",
     "lab2lib.h": "c",
     "cmath": "c",
-    "ship.h": "c"
+    "ship.h": "c",
+    "time.h": "c"
   }
 }
