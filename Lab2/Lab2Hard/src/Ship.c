@@ -40,6 +40,8 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
 
     shp->moveVect = malloc(sizeof(double) * 2);
 
+    shp->moveVect = calcVectFromAngle(shp->angle);
+
 
     shp->ScreenHeight = screenHeight;
     shp->ScreenWidth = screenWidth;
@@ -85,7 +87,6 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
 
 //Allowes us to draw with rotation (and also a texture)
 void drawShip(Ship *ship, SDL_Renderer *renderer){
-    
 
     SDL_RenderCopyEx(renderer, ship->shipTexture, NULL, &(ship->shipRect), ship->angle, NULL, SDL_FLIP_NONE);
 }
@@ -134,6 +135,22 @@ void moveShip(Ship *ship){
 
 }
 
+
+SDL_Rect getShipRect(Ship *ship){
+    return ship->shipRect;    
+}
+
+double *getMoveDir(Ship *ship){
+    return ship->moveVect;
+}
+
+void gameOver(Ship *ship){
+
+    printf("Game over!");
+    deleteShip(ship);
+
+}
+
 void updateShip(Ship *ship){
 
 
@@ -165,7 +182,10 @@ void updateShip(Ship *ship){
 
 }
 
+
 void deleteShip(Ship *ship){
+
     SDL_DestroyTexture(ship->shipTexture);
     free(ship);
+
 }

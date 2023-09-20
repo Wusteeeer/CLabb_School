@@ -2,17 +2,30 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 #include <stdlib.h>
 #include "Ship.h"
 #include "asteroid.h"
+#include "labMath.h"
+#include "bullet.h"
+#define ASTEROIDAMOUNT 10
+#define NO_STDIO_REDIRECT
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
-void asteroidHandler(Asteroid *asteroid, SDL_Renderer *renderer, int windowW, int windowH);
+
+void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH);
+
+void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH);
+
+
 
 int main(int argv, char** args)
 {      
 
-    srand(1);
+    
+    time_t t;
+    srand((unsigned)time(&t));
+
     int windowH = 700, windowW = 900;
 
     #pragma region SDL_Init
@@ -38,25 +51,9 @@ int main(int argv, char** args)
 
     bool isRunning = true;
 
-    //TODO: Make asteroids spawn outside and fly in
-    //If they leave the screen, make them respawn on a delay
-    //Make the player die if he touches any of them.
-    int randX = rand() % (windowW / 2) + 50;
-    int randY = rand() % (windowH / 2) + 50;
-    int randAngle = rand() % 360;
-    Asteroid* asteroid = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
+    Asteroid *asteroids[ASTEROIDAMOUNT];
 
-    srand(2);
-    randX = (windowW / 2) + 50;
-    randY = rand() % 200;
-    randAngle = rand() % 360;
-    Asteroid* asteroid2 = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
-
-    srand(3);
-    randX = (windowW / 2) + 50;
-    randY = (windowH / 2) + 50;
-    randAngle = rand() % 360;
-    Asteroid* asteroid3 = createAsteroid((int)randX, (int)randY, 0.5f, (int)randAngle, windowW, windowH, renderer);
+    spawnAsteroids(asteroids, renderer, 0.15f, 0.05f, ASTEROIDAMOUNT, windowW, windowH);
 
     do
     {
@@ -85,20 +82,32 @@ int main(int argv, char** args)
 
         }
         
+        
+      
+        for (int i = 0; i < ASTEROIDAMOUNT; i++)
+        {
+
+
+            if(collision(getShipRect(ship), getAstRect(asteroids[i]))){
+
+                gameOver(ship);
+                isRunning = false;
+
+            }
+
+        }
 
         //"Draw loop"
         SDL_RenderClear(renderer);
 
-                
+        asteroidHandler(asteroids, renderer, windowW, windowH);
         shipHandler(ship, renderer, acc, friction);
 
-        asteroidHandler(asteroid, renderer, windowW, windowH);
-        asteroidHandler(asteroid2, renderer, windowW, windowH);
-        asteroidHandler(asteroid3, renderer, windowW, windowH);
 
         SDL_RenderPresent(renderer);
 
-       
+
+        
 
     }while(isRunning);
 
@@ -136,9 +145,6 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
     }
 
 
-
-    // SDL_RenderClear(renderer);
-
     drawShip(ship, renderer);
 
     moveShip(ship);
@@ -146,20 +152,46 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
 
     drawShip(ship, renderer);
 
-    // SDL_RenderPresent(renderer);
 
 }
 
+void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship){
 
-void asteroidHandler(Asteroid *asteroid, SDL_Renderer *renderer, int windowW, int windowH)
+    const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
+
+
+    if(keyboard_state_array[SDL_SCANCODE_E]){
+        
+    }
+
+
+    Bullet *bullet = createBullet(100, 100, 0.01f, getMoveDir(ship), 0, windowW, windowH, renderer);
+
+    
+    drawBullet(bullet);
+    moveBullet(bullet);
+    updateBullet(bullet);
+    drawBullet(bullet);
+}
+
+
+void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH)
 {
 
-    drawAsteroid(asteroid, renderer);
 
-    moveAsteroid(asteroid);
-    updateAsteroid(asteroid);
+    for (int i = 0; i < ASTEROIDAMOUNT; i++)
+    {   
 
-    drawAsteroid(asteroid, renderer);
+        drawAsteroid(asteroids[i], renderer);
+
+        moveAsteroid(asteroids[i]);
+        updateAsteroid(asteroids[i]);
+
+        drawAsteroid(asteroids[i], renderer);
+
+    }
+    
+
 
 
 }

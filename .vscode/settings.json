@@ -64,6 +64,7 @@
     "lab2lib.h": "c",
     "cmath": "c",
     "ship.h": "c",
-    "time.h": "c"
+    "time.h": "c",
+    "stdio.h": "c"
   }
 }

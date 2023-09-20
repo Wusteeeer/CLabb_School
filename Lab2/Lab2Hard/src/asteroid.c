@@ -6,17 +6,22 @@
 #include "asteroid.h"
 #include "labMath.h"
 
+//TODO: Fix collisions. Add a collision box to the player to debug!
 struct asteroid{
 
-    float x, y, dx, dy, vel;
-    int screenH, screenW;
-    double *dir;
+    float x, y, dx, dy, vel, radius;
+    int screenH, screenW, boundingX, boundingY;
+    double *dir, angle;
 
     SDL_Rect astRect;
     SDL_Texture *astTexture;
     SDL_Renderer *astRenderer;
     
 };
+
+SDL_Rect getAstRect(Asteroid *ast){
+    return ast->astRect;
+}
 
 Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, SDL_Renderer *renderer){
 
@@ -25,7 +30,10 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
     ast->astRect.x = x;
     ast->astRect.y = y;
 
+    ast->boundingX = ast->boundingY = 0;
+
     ast->vel = vel;
+    ast->angle = 0;
     ast->dx = ast->dy = 0;
     ast->dir = calcVectFromAngle(angle);
 
@@ -49,8 +57,13 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
     SDL_QueryTexture(ast->astTexture, NULL, NULL, &(ast->astRect.w), &(ast->astRect.h));
 
-    ast->astRect.w *= 2;
-    ast->astRect.h *= 2;
+
+
+    int sizeMult = rand() % 2 + 2;
+    ast->astRect.w *= sizeMult;
+    ast->astRect.h *= sizeMult;
+
+    ast->radius = ast->astRect.w;
 
     ast->x = x - ast->astRect.w/2;
     ast->y = y - ast->astRect.h/2;
@@ -59,11 +72,43 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
 }
 
+void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int asteroidAmount, int windowW, int windowH){
+
+
+    float pos[] = {windowW / 2, windowH / 2}, vel = 0;
+    int boundingX = 1100, boundingY = 900;
+    double angle = 0, randAngle = 0;
+
+    
+    for (int i = 0; i < asteroidAmount; i++)
+    {
+        
+
+        randAngle = rand()/(double)RAND_MAX * 360;
+        
+
+        pos[0] += calcVectFromAngle(randAngle)[0] * (windowW);
+        pos[1] += calcVectFromAngle(randAngle)[1] * (windowH);
+
+        vel = rand()/(float)RAND_MAX * (maxVel - minVel) + minVel;
+
+        angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
+
+        asteroids[i] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
+
+        pos[0] = windowW / 2;
+        pos[1] = windowH / 2;
+    }
+    
+
+}
+
 void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
 
     SDL_RenderCopyEx(renderer, ast->astTexture, NULL, &(ast->astRect), 0, NULL, SDL_FLIP_NONE);
 
 }
+
 
 void moveAsteroid(Asteroid *ast){
 
@@ -74,10 +119,70 @@ void moveAsteroid(Asteroid *ast){
     ast->y += ast->dy;
 }
 
+
+void changeAsteroid(Asteroid *ast, float x, float y, float vel, double angle, float size){
+
+    ast->x = x;
+    ast->y = y;
+    ast->vel = vel;
+    ast->dir = calcVectFromAngle(angle);
+
+    ast->astRect.w += size;
+    ast->astRect.h += size;
+
+    ast->radius = ast->astRect.w;
+    
+    if(ast->astRect.w < 50){
+        ast->astRect.w = 50;
+    }
+
+    if(ast->astRect.h < 50){
+        ast->astRect.h = 50;
+    }
+
+    ast->radius = ast->astRect.w;
+    
+}
+
+
+void outSideBounds(Asteroid *ast){
+    double angle = 0, randAngle = 0;
+    float vel = 0;
+
+    float pos[] = {ast->screenW / 2, ast->screenH / 2};
+
+    randAngle = rand()/(double)RAND_MAX * 360;
+    
+
+    vel = rand()/(float)RAND_MAX * (0.2f - 0.1f) + 0.1f;
+
+    pos[0] += calcVectFromAngle(randAngle)[0] * (ast->screenW);
+    pos[1] += calcVectFromAngle(randAngle)[1] * (ast->screenH);
+
+
+    angle = atan2((ast->screenH / 2) - pos[1], (ast->screenW / 2) - pos[0]) * 180 / M_PI;
+
+    changeAsteroid(ast, pos[0], pos[1], vel, angle + rand() % 20 - 10, rand() % 20 - 10);
+
+}
 void updateAsteroid(Asteroid *ast){
 
+    //Make the asteroid change to a random pos after it has left the screen
     ast->astRect.x = (int)ast->x;
     ast->astRect.y = (int)ast->y;
+
+
+    
+
+
+    if(ast->x > ast->screenW + 500 || ast->x < -500){
+        outSideBounds(ast);
+    }
+
+    if(ast->y > ast->screenH + 500 || ast->y < -500){
+        outSideBounds(ast);
+    }
+
 }
 
 void destroyAsteroid(Asteroid *asteroid){
