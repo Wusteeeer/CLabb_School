@@ -6,7 +6,10 @@
 #include "asteroid.h"
 #include "labMath.h"
 
-//TODO: Fix collisions. Add a collision box to the player to debug!
+//TODO: Add a function that takes in the array of asteroids and creates new ones and adds them to the array
+//It should also delete the ones that go offscreen, and create a new one after this.
+//The function will need the array of asteroids, a max size, a screen width, height and everything that
+//is needed to create a asteroid (some things will need to be calculated like in the spawnasteroid function) 
 struct asteroid{
 
     float x, y, dx, dy, vel, radius;
@@ -72,33 +75,34 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
 }
 
-void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int asteroidAmount, int windowW, int windowH){
 
+void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int currentAsteroidAmount, int windowW, int windowH){
+
+
+    //Add functionality for creating new ones when old ones die (so call this in the draw loop)
+    //But check if the currentAsteroidAmount is less than maxAsteroid amount before doing anything
+    //If it is then create a new one, else do not. Then decrease the currentasteroidamount when destroying a asteroid
+    //Make sure to destroy from the array of asteroids (else it will have a empty space left)
+    asteroids[currentAsteroidAmount] = malloc(sizeof(struct asteroid));
 
     float pos[] = {windowW / 2, windowH / 2}, vel = 0;
     int boundingX = 1100, boundingY = 900;
     double angle = 0, randAngle = 0;
 
     
-    for (int i = 0; i < asteroidAmount; i++)
-    {
+    
+    randAngle = rand()/(double)RAND_MAX * 360;
         
 
-        randAngle = rand()/(double)RAND_MAX * 360;
-        
+    pos[0] += calcVectFromAngle(randAngle)[0] * (windowW);
+    pos[1] += calcVectFromAngle(randAngle)[1] * (windowH);
 
-        pos[0] += calcVectFromAngle(randAngle)[0] * (windowW);
-        pos[1] += calcVectFromAngle(randAngle)[1] * (windowH);
+    vel = rand()/(float)RAND_MAX * (maxVel - minVel) + minVel;
 
-        vel = rand()/(float)RAND_MAX * (maxVel - minVel) + minVel;
+    angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
-        angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
+    asteroids[currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
 
-        asteroids[i] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
-
-        pos[0] = windowW / 2;
-        pos[1] = windowH / 2;
-    }
     
 
 }

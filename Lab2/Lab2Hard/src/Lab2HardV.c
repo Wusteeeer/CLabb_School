@@ -15,7 +15,7 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
 
 void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH);
 
-void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH);
+void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
 
 
 
@@ -53,7 +53,18 @@ int main(int argv, char** args)
 
     Asteroid *asteroids[ASTEROIDAMOUNT];
 
-    spawnAsteroids(asteroids, renderer, 0.15f, 0.05f, ASTEROIDAMOUNT, windowW, windowH);
+    int currentAsteroidAmount = 0;
+
+    for (int i = 0; i < ASTEROIDAMOUNT; i++)
+    {
+        
+        spawnAsteroids(asteroids, renderer, 0.15f, 0.05f, currentAsteroidAmount, windowW, windowH);
+
+        currentAsteroidAmount++;
+    }
+    
+
+
 
     do
     {
@@ -154,14 +165,13 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
 
 
 }
-
 void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship){
 
     const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
 
 
     if(keyboard_state_array[SDL_SCANCODE_E]){
-        
+
     }
 
 
@@ -177,7 +187,6 @@ void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship)
 
 void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH)
 {
-
 
     for (int i = 0; i < ASTEROIDAMOUNT; i++)
     {   

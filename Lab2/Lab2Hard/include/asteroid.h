@@ -6,7 +6,7 @@ typedef struct asteroid Asteroid;
 
 Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, SDL_Renderer *renderer);
 
-void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int asteroidAmount, int windowW, int windowH);
+void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int currentAsteroidAmount, int windowW, int windowH);
 void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer);
 void changeAsteroid(Asteroid *ast, float x, float y, float vel, double angle, float size);
 void outSideBounds(Asteroid *ast);
