@@ -76,14 +76,35 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 }
 
 
-void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int currentAsteroidAmount, int windowW, int windowH){
+void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int *currentAsteroidAmount, int maxAsteroidAmount, int windowW, int windowH){
 
+    int index = *currentAsteroidAmount;
+
+    for (int i = 0; i < *currentAsteroidAmount; i++)
+    {
+        
+        if(outsideBounds(asteroids[i]->x, asteroids[i]->y, asteroids[i]->screenW, asteroids[i]->screenH)){
+        
+            destroyAsteroid(asteroids[i]);
+            (*currentAsteroidAmount)--;
+
+            //If we destroy an asteroid we need to create a new one at that spot at once
+            index = i;
+
+            break;
+        }
+    }
+
+
+    if(*currentAsteroidAmount >= maxAsteroidAmount){
+        return;
+    }
 
     //Add functionality for creating new ones when old ones die (so call this in the draw loop)
     //But check if the currentAsteroidAmount is less than maxAsteroid amount before doing anything
     //If it is then create a new one, else do not. Then decrease the currentasteroidamount when destroying a asteroid
     //Make sure to destroy from the array of asteroids (else it will have a empty space left)
-    asteroids[currentAsteroidAmount] = malloc(sizeof(struct asteroid));
+    asteroids[index] = malloc(sizeof(struct asteroid));
 
     float pos[] = {windowW / 2, windowH / 2}, vel = 0;
     int boundingX = 1100, boundingY = 900;
@@ -101,7 +122,9 @@ void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, 
 
     angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
-    asteroids[currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
+    asteroids[index] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
+
+    (*currentAsteroidAmount)++;
 
     
 
@@ -109,12 +132,21 @@ void spawnAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, 
 
 void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
 
+    
+    if(!ast){
+        return;
+    }
+
     SDL_RenderCopyEx(renderer, ast->astTexture, NULL, &(ast->astRect), 0, NULL, SDL_FLIP_NONE);
 
 }
 
 
 void moveAsteroid(Asteroid *ast){
+
+    if(!ast){
+        return;
+    }
 
     ast->dx = ast->vel * ast->dir[0];
     ast->dy = ast->vel * ast->dir[1];
@@ -124,51 +156,7 @@ void moveAsteroid(Asteroid *ast){
 }
 
 
-void changeAsteroid(Asteroid *ast, float x, float y, float vel, double angle, float size){
 
-    ast->x = x;
-    ast->y = y;
-    ast->vel = vel;
-    ast->dir = calcVectFromAngle(angle);
-
-    ast->astRect.w += size;
-    ast->astRect.h += size;
-
-    ast->radius = ast->astRect.w;
-    
-    if(ast->astRect.w < 50){
-        ast->astRect.w = 50;
-    }
-
-    if(ast->astRect.h < 50){
-        ast->astRect.h = 50;
-    }
-
-    ast->radius = ast->astRect.w;
-    
-}
-
-
-void outSideBounds(Asteroid *ast){
-    double angle = 0, randAngle = 0;
-    float vel = 0;
-
-    float pos[] = {ast->screenW / 2, ast->screenH / 2};
-
-    randAngle = rand()/(double)RAND_MAX * 360;
-    
-
-    vel = rand()/(float)RAND_MAX * (0.2f - 0.1f) + 0.1f;
-
-    pos[0] += calcVectFromAngle(randAngle)[0] * (ast->screenW);
-    pos[1] += calcVectFromAngle(randAngle)[1] * (ast->screenH);
-
-
-    angle = atan2((ast->screenH / 2) - pos[1], (ast->screenW / 2) - pos[0]) * 180 / M_PI;
-
-    changeAsteroid(ast, pos[0], pos[1], vel, angle + rand() % 20 - 10, rand() % 20 - 10);
-
-}
 void updateAsteroid(Asteroid *ast){
 
     //Make the asteroid change to a random pos after it has left the screen
@@ -176,16 +164,6 @@ void updateAsteroid(Asteroid *ast){
     ast->astRect.y = (int)ast->y;
 
 
-    
-
-
-    if(ast->x > ast->screenW + 500 || ast->x < -500){
-        outSideBounds(ast);
-    }
-
-    if(ast->y > ast->screenH + 500 || ast->y < -500){
-        outSideBounds(ast);
-    }
 
 }
 

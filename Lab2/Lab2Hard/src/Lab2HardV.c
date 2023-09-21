@@ -13,7 +13,7 @@
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
 
-void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH);
+void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount);
 
 void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
 
@@ -55,19 +55,15 @@ int main(int argv, char** args)
 
     int currentAsteroidAmount = 0;
 
-    for (int i = 0; i < ASTEROIDAMOUNT; i++)
-    {
-        
-        spawnAsteroids(asteroids, renderer, 0.15f, 0.05f, currentAsteroidAmount, windowW, windowH);
-
-        currentAsteroidAmount++;
-    }
     
 
 
 
     do
     {
+
+
+        spawnContinuousAsteroids(asteroids, renderer, 0.15f, 0.05f, &currentAsteroidAmount, ASTEROIDAMOUNT, windowW, windowH);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -95,7 +91,7 @@ int main(int argv, char** args)
         
         
       
-        for (int i = 0; i < ASTEROIDAMOUNT; i++)
+        for (int i = 0; i < currentAsteroidAmount; i++)
         {
 
 
@@ -111,7 +107,8 @@ int main(int argv, char** args)
         //"Draw loop"
         SDL_RenderClear(renderer);
 
-        asteroidHandler(asteroids, renderer, windowW, windowH);
+
+        asteroidHandler(asteroids, renderer, windowW, windowH, &currentAsteroidAmount);
         shipHandler(ship, renderer, acc, friction);
 
 
@@ -185,11 +182,12 @@ void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship)
 }
 
 
-void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH)
+void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount)
 {
 
-    for (int i = 0; i < ASTEROIDAMOUNT; i++)
+    for (int i = 0; i < *currentAsteroidAmount; i++)
     {   
+
 
         drawAsteroid(asteroids[i], renderer);
 

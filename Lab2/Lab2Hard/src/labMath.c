@@ -29,3 +29,19 @@ int collision(SDL_Rect sourceRect, SDL_Rect checkRect){
 
     return 0;
 }
+
+
+int outsideBounds(float x, float y, int screenW, int screenH){
+
+    
+    if(x > screenW + 500 || x < -500){
+        return 1;
+    }
+
+    if(y > screenH + 500 || y < -500){
+        return 1;
+    }
+
+    return 0;
+    
+}
