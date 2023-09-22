@@ -11,7 +11,8 @@ void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer);
 // void changeAsteroid(Asteroid *ast, float x, float y, float vel, double angle, float size);
 // void outSideBounds(Asteroid *ast);
 void moveAsteroid(Asteroid *ast);
-void updateAsteroid(Asteroid *ast);
+void updateAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex);
+void updateAsteroidArray(Asteroid **asteroids, int deleteIndex, int currentAsteroidAmount);
 SDL_Rect getAstRect(Asteroid *ast);
 void destroyAsteroid(Asteroid *asteroid);
 

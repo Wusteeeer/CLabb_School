@@ -78,33 +78,12 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
 void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int *currentAsteroidAmount, int maxAsteroidAmount, int windowW, int windowH){
 
-    int index = *currentAsteroidAmount;
-
-    for (int i = 0; i < *currentAsteroidAmount; i++)
-    {
-        
-        if(outsideBounds(asteroids[i]->x, asteroids[i]->y, asteroids[i]->screenW, asteroids[i]->screenH)){
-        
-            destroyAsteroid(asteroids[i]);
-            (*currentAsteroidAmount)--;
-
-            //If we destroy an asteroid we need to create a new one at that spot at once
-            index = i;
-
-            break;
-        }
-    }
-
 
     if(*currentAsteroidAmount >= maxAsteroidAmount){
         return;
     }
 
-    //Add functionality for creating new ones when old ones die (so call this in the draw loop)
-    //But check if the currentAsteroidAmount is less than maxAsteroid amount before doing anything
-    //If it is then create a new one, else do not. Then decrease the currentasteroidamount when destroying a asteroid
-    //Make sure to destroy from the array of asteroids (else it will have a empty space left)
-    asteroids[index] = malloc(sizeof(struct asteroid));
+    asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
 
     float pos[] = {windowW / 2, windowH / 2}, vel = 0;
     int boundingX = 1100, boundingY = 900;
@@ -122,7 +101,7 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
 
     angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
-    asteroids[index] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
+    asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
 
     (*currentAsteroidAmount)++;
 
@@ -155,14 +134,33 @@ void moveAsteroid(Asteroid *ast){
     ast->y += ast->dy;
 }
 
+void updateAsteroidArray(Asteroid **asteroids, int deleteIndex, int currentAsteroidAmount){
+    
+    for (int i = deleteIndex; i < currentAsteroidAmount - 1; i++) 
+    {
+
+        asteroids[i] = asteroids[i + 1];
+    
+    }
+}
+
+void updateAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex){
 
 
-void updateAsteroid(Asteroid *ast){
+    
+    if(outsideBounds(ast->x, ast->y, ast->screenW, ast->screenH, 500)){
+
+        destroyAsteroid(ast);
+        updateAsteroidArray(asteroids, deleteIndex, *currentAsteroidAmount);
+        (*currentAsteroidAmount)--;
+      
+        return;
+
+    }
 
     //Make the asteroid change to a random pos after it has left the screen
     ast->astRect.x = (int)ast->x;
     ast->astRect.y = (int)ast->y;
-
 
 
 }

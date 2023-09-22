@@ -1,28 +1,35 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
-#include <math.h>
 #include <stdlib.h>
 #include "Ship.h"
 #include "asteroid.h"
 #include "labMath.h"
 #include "bullet.h"
-#define ASTEROIDAMOUNT 10
+#include "score.h"
+#define ASTEROIDAMOUNT 15
+#define MAXBULLETAMOUNT 2
+#define FONTSIZE 50
 #define NO_STDIO_REDIRECT
+
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
 
 void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount);
 
-void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
+void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
 
-
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentAsteroidAmount, int *currentBulletAmount, bool *isRunning);
 
 int main(int argv, char** args)
 {      
 
-    
+    TTF_Init();
+
+  
+
     time_t t;
     srand((unsigned)time(&t));
 
@@ -55,13 +62,25 @@ int main(int argv, char** args)
 
     int currentAsteroidAmount = 0;
 
-    
 
+
+    int currentBulletAmount = 0;
+
+    bool shot = false;
+    
+    Bullet *bullets[MAXBULLETAMOUNT];
+
+    SDL_Color color = {255, 255, 255};
+
+    Score *score = createScore(windowW / 2, 10, renderer, color, 0, FONTSIZE);
+
+    float points = 0;
 
 
     do
     {
 
+        // printf("%d\n", SDL_GetPerformanceCounter());
 
         spawnContinuousAsteroids(asteroids, renderer, 0.15f, 0.05f, &currentAsteroidAmount, ASTEROIDAMOUNT, windowW, windowH);
 
@@ -88,34 +107,36 @@ int main(int argv, char** args)
             }
 
         }
-        
-        
-      
-        for (int i = 0; i < currentAsteroidAmount; i++)
-        {
-
-
-            if(collision(getShipRect(ship), getAstRect(asteroids[i]))){
-
-                gameOver(ship);
-                isRunning = false;
-
-            }
-
-        }
-
+   
         //"Draw loop"
         SDL_RenderClear(renderer);
 
-
         asteroidHandler(asteroids, renderer, windowW, windowH, &currentAsteroidAmount);
         shipHandler(ship, renderer, acc, friction);
+        bulletHandler(bullets, &currentBulletAmount, &shot, renderer, windowW, windowH, ship);
+
+        printScore(score);
 
 
         SDL_RenderPresent(renderer);
-
-
         
+        if(SDL_GetPerformanceCounter() % 10 == 0){
+            
+            collisionHandler(
+                ship, 
+                bullets, 
+                asteroids, 
+                score, 
+                &points, 
+                renderer, 
+                &currentAsteroidAmount, 
+                &currentBulletAmount, 
+                &isRunning
+            );
+        }
+     
+
+        SDL_Delay(0.1f);
 
     }while(isRunning);
 
@@ -162,25 +183,58 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction){
 
 
 }
-void bulletHandler(SDL_Renderer *renderer, int windowW, int windowH, Ship *ship){
+
+void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_Renderer *renderer, int windowW, int windowH, Ship *ship){
 
     const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
 
+    SDL_Rect shipRect = getShipRect(ship);
 
-    if(keyboard_state_array[SDL_SCANCODE_E]){
+    if(keyboard_state_array[SDL_SCANCODE_E] && !(*shot))
+    {
+
+        spawnBullet(
+            bullets, 
+            currentBulletAmount, 
+            MAXBULLETAMOUNT, 
+            shipRect.x + shipRect.w / 2, 
+            shipRect.y + shipRect.h / 2, 
+            windowW, 
+            windowH, 
+            1, 
+            getMoveDir(ship), 
+            renderer
+            );
+    
+        *shot = true;
+
+    }
+    else if(!keyboard_state_array[SDL_SCANCODE_E])
+    {
+
+        *shot = false;
 
     }
 
 
-    Bullet *bullet = createBullet(100, 100, 0.01f, getMoveDir(ship), 0, windowW, windowH, renderer);
 
-    
-    drawBullet(bullet);
-    moveBullet(bullet);
-    updateBullet(bullet);
-    drawBullet(bullet);
+    for (int i = 0; i < *currentBulletAmount; i++)
+    {
+        
+
+        if(bullets[i]){
+
+            updateBullet(bullets[i], bullets, currentBulletAmount, i);
+
+            drawBullet(bullets[i]);
+            moveBullet(bullets[i]);
+            drawBullet(bullets[i]);
+
+        }
+
+    }
+
 }
-
 
 void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount)
 {
@@ -188,11 +242,11 @@ void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, 
     for (int i = 0; i < *currentAsteroidAmount; i++)
     {   
 
+        updateAsteroid(asteroids[i], asteroids, currentAsteroidAmount, i);
 
         drawAsteroid(asteroids[i], renderer);
 
         moveAsteroid(asteroids[i]);
-        updateAsteroid(asteroids[i]);
 
         drawAsteroid(asteroids[i], renderer);
 
@@ -201,4 +255,43 @@ void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, 
 
 
 
+}
+
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentAsteroidAmount, int *currentBulletAmount, bool *isRunning)
+{
+
+    for (int i = 0; i < *currentAsteroidAmount; i++)
+    {
+
+
+        if(collision(getShipRect(ship), getAstRect(asteroids[i]))){
+
+            gameOver(ship);
+            *isRunning = false;
+
+        }
+
+        for (int j = 0; j < *currentBulletAmount; j++)
+        {
+        
+            if(collision(getBulletRect(bullets[j]), getAstRect(asteroids[i]))){
+                
+                changeScore(score, 20.0f + getAstRect(asteroids[i]).w);
+                (*points) += 20.0f + getAstRect(asteroids[i]).w;
+
+                destroyAsteroid(asteroids[i]);
+
+                updateAsteroidArray(asteroids, i, *currentAsteroidAmount);
+
+
+                (*currentAsteroidAmount)--;
+                    
+            }
+        }
+            
+
+    }
+
+    
+ 
 }

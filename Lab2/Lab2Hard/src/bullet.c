@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "bullet.h"
+#include "labMath.h"
 
 
 struct bullet{
@@ -56,11 +57,18 @@ Bullet *createBullet(float x, float y, float vel, double *dir, double angle, flo
 
 }
 
+SDL_Rect getBulletRect(Bullet *bullet){
+    return bullet->bulletRect;
+}
+
 void drawBullet(Bullet *bullet){
     SDL_RenderCopyEx(bullet->bulletRenderer, bullet->bulletTexture, NULL, &(bullet->bulletRect), bullet->angle, NULL, SDL_FLIP_NONE);
 }
 
 void moveBullet(Bullet *bullet){
+
+
+
 
     bullet->dx = bullet->dir[0] * bullet->vel;
     bullet->dy = bullet->dir[1] * bullet->vel;
@@ -70,11 +78,59 @@ void moveBullet(Bullet *bullet){
 
 }
 
+void spawnBullet(Bullet **bullets, int *currentBulletAmount, int maxBulletAmount, float x, float y, int screenW, int screenH, float vel, double *dir, SDL_Renderer *renderer){
 
-void updateBullet(Bullet *bullet){
+    if(*currentBulletAmount >= maxBulletAmount){
+        return;
+    }
 
+    bullets[*currentBulletAmount] = malloc(sizeof(struct bullet));
+
+    bullets[*currentBulletAmount] = createBullet(x, y, vel, dir, 0, screenW, screenH, renderer);
+
+    (*currentBulletAmount)++;
+
+
+}
+
+void updateBulletArray(Bullet **bullets, int deleteIndex, int currentBulletAmount){
+    
+    for (int i = deleteIndex; i < currentBulletAmount - 1; i++) 
+    {
+
+        bullets[i] = bullets[i + 1];
+    
+    }
+    
+
+}
+
+void updateBullet(Bullet *bullet, Bullet **bullets, int *currentBulletAmount, int deleteIndex){
+
+    
+    if(outsideBounds(bullet->x, bullet->y, bullet->screenW, bullet->screenH, 0)){
+
+
+        //Move everything after down in the array
+        updateBulletArray(bullets, deleteIndex, *currentBulletAmount);
+
+        deleteBullet(bullet);
+        
+
+        (*currentBulletAmount)--;
+
+
+        return;
+    }
 
     bullet->bulletRect.x = bullet->x;
     bullet->bulletRect.y = bullet->y;
+
+}
+
+void deleteBullet(Bullet *bullet){
+
+    SDL_DestroyTexture(bullet->bulletTexture);
+    free(bullet);
 
 }

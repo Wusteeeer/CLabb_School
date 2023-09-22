@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "labMath.h"
@@ -31,17 +32,18 @@ int collision(SDL_Rect sourceRect, SDL_Rect checkRect){
 }
 
 
-int outsideBounds(float x, float y, int screenW, int screenH){
+int outsideBounds(float x, float y, int screenW, int screenH, int offset){
 
     
-    if(x > screenW + 500 || x < -500){
+    if(x > screenW + offset || x < -offset){
         return 1;
     }
 
-    if(y > screenH + 500 || y < -500){
+    if(y > screenH + offset || y < -offset){
         return 1;
     }
 
     return 0;
     
 }
+
