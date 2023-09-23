@@ -5,28 +5,32 @@
 #include <stdbool.h>
 
 
-void sort(int ages[], int size);
-void printAges(int ages[], int size);
-void initAges(int ages[], int size);
+void printArr(int arr[], int size);
+void initAges(int arr[], int size);
 
 void mode(int ages[], int size);
 
-int median(int ages[], int size);
+float median(int ages[], int size);
 
-int mean(int ages[], int size);
+float mean(int ages[], int size);
 
 int main(){
 
     srand(time(NULL));
-    int size = 50;
+
+    printf("Hur manga personer vill du gora statistik for? ");
+    int size = 10;
+    scanf("%d", &size);
 
     int ages[size];
 
     initAges(ages, size);
-    // printAges(ages, size);
 
-    sort(ages, size);
-    // printAges(ages, size);
+    printArr(ages, size);
+
+
+    printf("Medelvardet: %.1f ar\n", mean(ages, size));
+    printf("Median: %.1f ar\n", median(ages, size)); 
     mode(ages, size);
 
 
@@ -42,93 +46,101 @@ void initAges(int ages[], int size){
 
 }
 
-void printAges(int ages[], int size){
+void printArr(int arr[], int size){
 
     for (int i = 0; i < size; i++)
     {
-        printf("%d, ", ages[i]);
+        if(i == size - 1){
+
+            printf("%d", arr[i]);
+            break;
+
+        }
+        printf("%d, ", arr[i]);
     }
     
     printf("\n");
 
 }
 
-void sort(int ages[], int size){
-
-    int max = -INT_MAX, min = INT_MAX;
-
-    for (int i = 0; i < size - 1; i++)
-    {
-        for (int j = 0; j < size - 1 - i; j++)
-        {
-            
-            if(ages[j] < ages[j + 1]){
-                
-                int temp = ages[j];
-
-                ages[j] = ages[j + 1];
-
-                ages[j + 1] = temp;
-
-            }
-
-        }
-        
-    }
-    
-
-}
 
 void mode(int ages[], int size){
     
-    int mode[size], biggestSequences[size], currentSeq = 1, biggestSeq = 1, modeIter = 0;
 
-    for (int i = 0; i < size - 1; i++)
+    printf("Typvardet: ");
+    int mode[size], occurences[size], largestOccurance = 0;
+    
+    for (int i = 0; i < size; i++)
     {
 
-        if(ages[i] == ages[i + 1]){
+        occurences[i] = 0;
+        mode[i] = 0;
 
-            currentSeq++;
-            // printf("%d, %d\n", ages[i], ages[i + 1]);
+        for (int j = i + 1; j < size; j++)
+        {  
 
-        }else
-        {
-
-            if(currentSeq > biggestSeq){                
-
-                biggestSeq = currentSeq;
-                biggestSequences[modeIter] = biggestSeq;
-
-                for (int i = 0; i < modeIter + 1; i++)
-                {
-                    if(biggestSeq < biggestSequences[i]){
-                        mode[i] = ages[i];
-                        break;
-                    }else{
-                        mode[modeIter] = ages[i];
-                    }
-                }
-                
-
-                modeIter++;
+            if(ages[i] == ages[j]){
+                occurences[i]++;
             }
-            // printf("%d, %d\n", ages[i], ages[i + 1]);
 
-            // if(currentSeq >= biggestSeq){
+        }
 
-            //     modeArr = (int*)realloc(modeArr, modeIter);
-            //     modeArr[modeIter] = ages[i];
-            //     modeIter++;
-            //     biggestSeq = currentSeq;
-            // }
+        if(occurences[i] > largestOccurance)
+        {
+            largestOccurance = occurences[i];
+        }
 
+    
+    }
+
+
+    int modeIter = 0;
+    for (int i = 0; i < size; i++)
+    {  
+
+        if(occurences[i] >= largestOccurance){
+            mode[modeIter] = ages[i];
+            modeIter++;
         }
 
     }
 
-    printAges(mode, modeIter);
-    // printAges(modeArr, modeIter);
+    printArr(mode, modeIter);
     
     
     
+    
+    
+    
+}
+
+
+float median(int ages[], int size){
+
+    if(size % 2 == 0){
+
+        float left = ages[(size / 2) - 1], right = ages[(size / 2)];
+        return (left + right) / 2;
+
+    }else{
+
+        return ages[(int)(size / 2)];
+
+    }
+
+}
+
+float mean(int ages[], int size){
+
+    float allAges = 0;
+
+    for (int i = 0; i < size; i++)
+    {
+        allAges += ages[i];
+    }
+    
+
+    return allAges / size;
+
+
 }

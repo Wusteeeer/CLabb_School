@@ -9,10 +9,9 @@
 #include "labMath.h"
 #include "bullet.h"
 #include "score.h"
-#define ASTEROIDAMOUNT 15
+#define ASTEROIDAMOUNT 10
 #define MAXBULLETAMOUNT 2
 #define FONTSIZE 50
-#define NO_STDIO_REDIRECT
 
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
@@ -70,17 +69,14 @@ int main(int argv, char** args)
     
     Bullet *bullets[MAXBULLETAMOUNT];
 
+
     SDL_Color color = {255, 255, 255};
-
     Score *score = createScore(windowW / 2, 10, renderer, color, 0, FONTSIZE);
-
     float points = 0;
 
 
     do
     {
-
-        // printf("%d\n", SDL_GetPerformanceCounter());
 
         spawnContinuousAsteroids(asteroids, renderer, 0.15f, 0.05f, &currentAsteroidAmount, ASTEROIDAMOUNT, windowW, windowH);
 
@@ -108,7 +104,7 @@ int main(int argv, char** args)
 
         }
    
-        //"Draw loop"
+
         SDL_RenderClear(renderer);
 
         asteroidHandler(asteroids, renderer, windowW, windowH, &currentAsteroidAmount);
@@ -136,7 +132,7 @@ int main(int argv, char** args)
         }
      
 
-        SDL_Delay(0.1f);
+        SDL_Delay(0.2f);
 
     }while(isRunning);
 
@@ -279,11 +275,9 @@ void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score 
                 changeScore(score, 20.0f + getAstRect(asteroids[i]).w);
                 (*points) += 20.0f + getAstRect(asteroids[i]).w;
 
+
                 destroyAsteroid(asteroids[i]);
-
                 updateAsteroidArray(asteroids, i, *currentAsteroidAmount);
-
-
                 (*currentAsteroidAmount)--;
                     
             }

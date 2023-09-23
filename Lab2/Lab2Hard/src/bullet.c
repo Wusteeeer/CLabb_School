@@ -111,7 +111,6 @@ void updateBullet(Bullet *bullet, Bullet **bullets, int *currentBulletAmount, in
     if(outsideBounds(bullet->x, bullet->y, bullet->screenW, bullet->screenH, 0)){
 
 
-        //Move everything after down in the array
         updateBulletArray(bullets, deleteIndex, *currentBulletAmount);
 
         deleteBullet(bullet);
