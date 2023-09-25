@@ -7,6 +7,8 @@
 
 void printArr(int arr[], int size);
 void initAges(int arr[], int size);
+void userInput(int *size);
+void sortArray(int arr[], int size);
 
 void mode(int ages[], int size);
 
@@ -17,16 +19,22 @@ float mean(int ages[], int size);
 int main(){
 
     srand(time(NULL));
-
-    printf("Hur manga personer vill du gora statistik for? ");
     int size = 10;
-    scanf("%d", &size);
+
+    userInput(&size);
+
 
     int ages[size];
 
     initAges(ages, size);
 
-    printArr(ages, size);
+    if(size < 31){
+
+        printArr(ages, size);
+
+    }
+
+    sortArray(ages, size);
 
 
     printf("Medelvardet: %.1f ar\n", mean(ages, size));
@@ -37,6 +45,30 @@ int main(){
     return 0;
 }
 
+void userInput(int *size){
+    
+
+    while(1){
+
+        printf("Hur manga personer vill du gora statistik for? ");
+        scanf("%d", size);
+
+        if(*size < 1000 && *size > 0)
+        {
+
+            break;
+
+        }else{
+
+            printf("Valj ett nummer mellan 1 och 999\n");
+
+        }
+
+    }
+
+
+}
+
 void initAges(int ages[], int size){
 
     for (int i = 0; i < size; i++)
@@ -45,6 +77,30 @@ void initAges(int ages[], int size){
     }
 
 }
+
+void sortArray(int arr[], int size){
+    
+    int temp = 0;
+    for (int i = 0; i < size - 1; i++)
+    {
+        for (int j = 0; j < size - 1 - i; j++)
+        {
+            
+            if(arr[j] < arr[j + 1]){
+                
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+
+            }
+
+        }
+        
+    }
+    
+
+}
+
 
 void printArr(int arr[], int size){
 

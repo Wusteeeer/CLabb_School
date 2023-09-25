@@ -9,24 +9,24 @@
 #include "labMath.h"
 #include "bullet.h"
 #include "score.h"
-#define ASTEROIDAMOUNT 10
 #define MAXBULLETAMOUNT 2
 #define FONTSIZE 50
 
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, float acc, float friction);
 
-void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount);
+void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH, int *currentasteroidAmount);
 
 void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
 
-void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentAsteroidAmount, int *currentBulletAmount, bool *isRunning);
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentasteroidAmount, int *currentBulletAmount, bool *isRunning);
 
 int main(int argv, char** args)
 {      
 
     TTF_Init();
 
+    int asteroidAmount = 10;
   
 
     time_t t;
@@ -57,7 +57,7 @@ int main(int argv, char** args)
 
     bool isRunning = true;
 
-    Asteroid *asteroids[ASTEROIDAMOUNT];
+    Asteroid *asteroids[asteroidAmount];
 
     int currentAsteroidAmount = 0;
 
@@ -78,7 +78,23 @@ int main(int argv, char** args)
     do
     {
 
-        spawnContinuousAsteroids(asteroids, renderer, 0.15f, 0.05f, &currentAsteroidAmount, ASTEROIDAMOUNT, windowW, windowH);
+
+        if(SDL_GetPerformanceCounter() % 10 == 0){
+            
+            collisionHandler(
+                ship, 
+                bullets, 
+                asteroids, 
+                score, 
+                &points, 
+                renderer, 
+                &currentAsteroidAmount, 
+                &currentBulletAmount, 
+                &isRunning
+            );
+        }
+
+        spawnContinuousAsteroids(asteroids, renderer, 0.15f, 0.05f, &currentAsteroidAmount, asteroidAmount, windowW, windowH);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -116,20 +132,7 @@ int main(int argv, char** args)
 
         SDL_RenderPresent(renderer);
         
-        if(SDL_GetPerformanceCounter() % 10 == 0){
-            
-            collisionHandler(
-                ship, 
-                bullets, 
-                asteroids, 
-                score, 
-                &points, 
-                renderer, 
-                &currentAsteroidAmount, 
-                &currentBulletAmount, 
-                &isRunning
-            );
-        }
+
      
 
         SDL_Delay(0.2f);
@@ -232,13 +235,13 @@ void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_R
 
 }
 
-void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH, int *currentAsteroidAmount)
+void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, int windowH, int *currentasteroidAmount)
 {
 
-    for (int i = 0; i < *currentAsteroidAmount; i++)
+    for (int i = 0; i < *currentasteroidAmount; i++)
     {   
 
-        updateAsteroid(asteroids[i], asteroids, currentAsteroidAmount, i);
+        updateAsteroid(asteroids[i], asteroids, currentasteroidAmount, i);
 
         drawAsteroid(asteroids[i], renderer);
 
@@ -253,10 +256,10 @@ void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, 
 
 }
 
-void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentAsteroidAmount, int *currentBulletAmount, bool *isRunning)
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, int *currentasteroidAmount, int *currentBulletAmount, bool *isRunning)
 {
 
-    for (int i = 0; i < *currentAsteroidAmount; i++)
+    for (int i = 0; i < *currentasteroidAmount; i++)
     {
 
 
@@ -269,16 +272,41 @@ void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score 
 
         for (int j = 0; j < *currentBulletAmount; j++)
         {
-        
+
+
+            
             if(collision(getBulletRect(bullets[j]), getAstRect(asteroids[i]))){
+
+
+                SDL_Rect asteroidRect = getAstRect(asteroids[i]);
+
+
+                changeScore(score, 20.0f + asteroidRect.w);
+                (*points) += 20.0f + asteroidRect.w;
+
+                deleteBullet(bullets[j]);
+                updateBulletArray(bullets, j, *currentBulletAmount);
+                (*currentBulletAmount)--;
+
+                Asteroid *temp = asteroids[i];
+        
                 
-                changeScore(score, 20.0f + getAstRect(asteroids[i]).w);
-                (*points) += 20.0f + getAstRect(asteroids[i]).w;
-
-
                 destroyAsteroid(asteroids[i]);
-                updateAsteroidArray(asteroids, i, *currentAsteroidAmount);
-                (*currentAsteroidAmount)--;
+                updateAsteroidArray(asteroids, i, *currentasteroidAmount);
+                (*currentasteroidAmount)--;
+
+                //TODO: MAKE SPLITTING OF ASTEROIDS WORK!!!
+                // if(asteroidRect.w > 40){
+                    
+                //    splitAsteroid(temp, asteroids, currentasteroidAmount);
+
+
+                // }
+
+                printf("%d\n, ", *currentasteroidAmount);
+
+
+
                     
             }
         }

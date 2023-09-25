@@ -26,7 +26,7 @@ SDL_Rect getAstRect(Asteroid *ast){
     return ast->astRect;
 }
 
-Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, SDL_Renderer *renderer){
+Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, SDL_Renderer *renderer, int *currentAsteroidAmount){
 
     Asteroid *ast = malloc(sizeof(struct asteroid));
 
@@ -71,13 +71,15 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
     ast->x = x - ast->astRect.w/2;
     ast->y = y - ast->astRect.h/2;
 
+    
+    (*currentAsteroidAmount)++;
+
     return ast;
 
 }
 
 
 void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int *currentAsteroidAmount, int maxAsteroidAmount, int windowW, int windowH){
-
 
     if(*currentAsteroidAmount >= maxAsteroidAmount){
         return;
@@ -101,9 +103,8 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
 
     angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
-    asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer);
+    asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer, currentAsteroidAmount);
 
-    (*currentAsteroidAmount)++;
 
     
 
@@ -120,6 +121,22 @@ void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
 
 }
 
+void splitAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount){
+
+    for (int i = 1; i < 2; i++)
+    {
+
+        (*currentAsteroidAmount)++;
+        asteroids[(*currentAsteroidAmount)] = malloc(sizeof(struct asteroid));
+
+        asteroids[(*currentAsteroidAmount)] = createAsteroid(ast->astRect.x, ast->astRect.y, ast->vel - rand() % 2, ast->angle + rand() % 10 - 5, ast->screenW, ast->screenH, ast->astRenderer, currentAsteroidAmount);
+
+
+        
+
+    }
+    
+}
 
 void moveAsteroid(Asteroid *ast){
 
@@ -140,8 +157,11 @@ void updateAsteroidArray(Asteroid **asteroids, int deleteIndex, int currentAster
     {
 
         asteroids[i] = asteroids[i + 1];
+
     
     }
+
+
 }
 
 void updateAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex){

@@ -14,7 +14,7 @@ INCLUDE = -IC:\msys64\mingw64\include -I${INCDIR}
 CFLAGS = -g ${INCLUDE} -c
 
 #These are used to make certain SDL libs work - order matters!
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -mwindows -lm
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 
 Lab2HV : ${OBJ}
 
