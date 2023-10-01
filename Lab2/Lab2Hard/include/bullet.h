@@ -5,7 +5,7 @@ typedef struct bullet Bullet;
 
 Bullet *createBullet(float x, float y, float vel, double *dir, double angle, float screenW, float screenH, SDL_Renderer *renderer);
 
-void drawBullet(Bullet *bullet);
+void drawBullet(Bullet *bullet, int currentBulletAmount);
 void moveBullet(Bullet *bullet);
 void updateBullet(Bullet *bullet, Bullet **bullets, int *currentBulletAmount, int deleteIndex);
 void updateBulletArray(Bullet **bullets, int deleteIndex, int currentBulletAmount);

@@ -61,12 +61,16 @@ SDL_Rect getBulletRect(Bullet *bullet){
     return bullet->bulletRect;
 }
 
-void drawBullet(Bullet *bullet){
+void drawBullet(Bullet *bullet, int currentBulletAmount){
+
+    if(currentBulletAmount == 0){
+        return;
+    }
+
     SDL_RenderCopyEx(bullet->bulletRenderer, bullet->bulletTexture, NULL, &(bullet->bulletRect), bullet->angle, NULL, SDL_FLIP_NONE);
 }
 
 void moveBullet(Bullet *bullet){
-
 
 
 
@@ -130,6 +134,9 @@ void updateBullet(Bullet *bullet, Bullet **bullets, int *currentBulletAmount, in
 void deleteBullet(Bullet *bullet){
 
     SDL_DestroyTexture(bullet->bulletTexture);
+
     free(bullet);
+
+    bullet = NULL;
 
 }

@@ -144,12 +144,6 @@ double *getMoveDir(Ship *ship){
     return ship->moveVect;
 }
 
-void gameOver(Ship *ship){
-
-    printf("Game over!");
-    deleteShip(ship);
-
-}
 
 void updateShip(Ship *ship){
 

@@ -65,6 +65,7 @@
     "cmath": "c",
     "ship.h": "c",
     "time.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "typeinfo": "c"
   }
 }

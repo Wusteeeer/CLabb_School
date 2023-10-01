@@ -14,7 +14,6 @@ void thrusters(Ship *ship, float acc, float fric);
 
 SDL_Rect getShipRect(Ship *ship);
 double *getMoveDir(Ship *ship);
-void gameOver(Ship *ship);
 void deleteShip(Ship *ship);
 
 #endif

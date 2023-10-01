@@ -16,6 +16,8 @@ struct asteroid{
     int screenH, screenW, boundingX, boundingY;
     double *dir, angle;
 
+    char name[100];
+
     SDL_Rect astRect;
     SDL_Texture *astTexture;
     SDL_Renderer *astRenderer;
@@ -23,15 +25,36 @@ struct asteroid{
 };
 
 SDL_Rect getAstRect(Asteroid *ast){
+
+    if(!ast->astTexture){
+
+        SDL_Rect rect = {100, 100, 100, 100};
+        return rect;
+    }
+
     return ast->astRect;
 }
 
-Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, SDL_Renderer *renderer, int *currentAsteroidAmount){
+Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW, int screenH, int sizeMult, SDL_Renderer *renderer, int *currentAsteroidAmount, int *totalAsteroidAmount){
 
     Asteroid *ast = malloc(sizeof(struct asteroid));
 
+    if(!ast){
+        printf("%s\n", SDL_GetError());
+        return NULL;
+    }
+
     ast->astRect.x = x;
     ast->astRect.y = y;
+
+    char str[100];
+    sprintf(str, "ast%d", *totalAsteroidAmount);
+
+    strcpy(ast->name, str);
+
+
+    // puts(ast->name);
+ 
 
     ast->boundingX = ast->boundingY = 0;
 
@@ -62,7 +85,6 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
 
 
-    int sizeMult = rand() % 2 + 2;
     ast->astRect.w *= sizeMult;
     ast->astRect.h *= sizeMult;
 
@@ -73,39 +95,42 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
     
     (*currentAsteroidAmount)++;
+    (*totalAsteroidAmount)++;
 
     return ast;
 
 }
 
 
-void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int *currentAsteroidAmount, int maxAsteroidAmount, int windowW, int windowH){
+void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, float maxVel, float minVel, int *currentAsteroidAmount, int maxAsteroidAmount, int windowW, int windowH, int *totalAsteroidAmount){
 
-    if(*currentAsteroidAmount >= maxAsteroidAmount){
-        return;
-    }
+    if(*currentAsteroidAmount < maxAsteroidAmount){
 
-    asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
-
-    float pos[] = {windowW / 2, windowH / 2}, vel = 0;
-    int boundingX = 1100, boundingY = 900;
-    double angle = 0, randAngle = 0;
+        // printf("%d, %d\n", maxAsteroidAmount, *currentAsteroidAmount);
+        float pos[] = {windowW / 2, windowH / 2}, vel = 0;
+        int boundingX = 1100, boundingY = 900;
+        double angle = 0, randAngle = 0;
 
     
     
-    randAngle = rand()/(double)RAND_MAX * 360;
+        randAngle = rand()/(double)RAND_MAX * 360;
         
 
-    pos[0] += calcVectFromAngle(randAngle)[0] * (windowW);
-    pos[1] += calcVectFromAngle(randAngle)[1] * (windowH);
+        pos[0] += calcVectFromAngle(randAngle)[0] * (windowW);
+        pos[1] += calcVectFromAngle(randAngle)[1] * (windowH);
 
-    vel = rand()/(float)RAND_MAX * (maxVel - minVel) + minVel;
+        vel = rand()/(float)RAND_MAX * (maxVel - minVel) + minVel;
 
-    angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
+        angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
-    asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, renderer, currentAsteroidAmount);
+        asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
+        asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, rand() % 2 + 2, renderer, currentAsteroidAmount, totalAsteroidAmount);
 
 
+    
+    }
+
+   
     
 
 }
@@ -121,20 +146,18 @@ void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
 
 }
 
-void splitAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount){
+void splitAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount, SDL_Renderer *renderer, int *totalAsteroidAmount){
 
-    for (int i = 1; i < 2; i++)
-    {
-
-        (*currentAsteroidAmount)++;
-        asteroids[(*currentAsteroidAmount)] = malloc(sizeof(struct asteroid));
-
-        asteroids[(*currentAsteroidAmount)] = createAsteroid(ast->astRect.x, ast->astRect.y, ast->vel - rand() % 2, ast->angle + rand() % 10 - 5, ast->screenW, ast->screenH, ast->astRenderer, currentAsteroidAmount);
-
+    for (int i = 0; i < 2; i++)
+    {   
+        asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
+        asteroids[*currentAsteroidAmount] = createAsteroid(ast->astRect.x, ast->astRect.y, ast->vel + rand()/(float)RAND_MAX * 0.10f - 0.05f, rand() % 360, 1000, 1000, 2, renderer, currentAsteroidAmount, totalAsteroidAmount);
 
         
-
     }
+
+
+
     
 }
 
@@ -155,37 +178,93 @@ void updateAsteroidArray(Asteroid **asteroids, int deleteIndex, int currentAster
     
     for (int i = deleteIndex; i < currentAsteroidAmount - 1; i++) 
     {
-
+        // printf("%d, %s = %s\n", deleteIndex, asteroids[i]->name, asteroids[i + 1]->name);
         asteroids[i] = asteroids[i + 1];
-
     
     }
 
+    // SDL_DestroyTexture(asteroids[currentAsteroidAmount]->astTexture);
+    // free(asteroids[currentAsteroidAmount]);
 
+    //TODO: I need to figure out a way to free the last element. Otherwise the last one will be the same as the second-to-last one
+    //Which makes the currentAsteroidAmount not the correct size. But when I try to free it the game crashes.
+    
 }
 
-void updateAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex){
+char *getAstName(Asteroid *ast){
+    return ast->name;
+}
 
+void updateAsteroid(Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex){
 
+    // printf("%d\n", *currentAsteroidAmount);
+    // puts(asteroids[]->name);
+    // for (int i = 0; i < *currentAsteroidAmount; i++)
+    // {
+    //     printf("%s\n", asteroids[i]->name);
+    // }
+
+    if(deleteIndex >= *currentAsteroidAmount){
+        return;
+    }
+
+    // printf("%d, %d\n", *currentAsteroidAmount, deleteIndex);
     
-    if(outsideBounds(ast->x, ast->y, ast->screenW, ast->screenH, 500)){
 
-        destroyAsteroid(ast);
-        updateAsteroidArray(asteroids, deleteIndex, *currentAsteroidAmount);
-        (*currentAsteroidAmount)--;
-      
+    if(outsideBounds(asteroids[deleteIndex]->x, asteroids[deleteIndex]->y, asteroids[deleteIndex]->screenW, asteroids[deleteIndex]->screenH, 500)){
+
+        // updateAsteroidArray(asteroids, deleteIndex, *currentAsteroidAmount);
+        destroyAsteroid(asteroids[deleteIndex], asteroids, deleteIndex, currentAsteroidAmount);
+        // (*currentAsteroidAmount)--;
+
         return;
 
     }
+    
+    // puts(asteroids[deleteIndex]->name);
 
-    //Make the asteroid change to a random pos after it has left the screen
-    ast->astRect.x = (int)ast->x;
-    ast->astRect.y = (int)ast->y;
+
+    asteroids[deleteIndex]->astRect.x = (int)asteroids[deleteIndex]->x;
+    asteroids[deleteIndex]->astRect.y = (int)asteroids[deleteIndex]->y;
 
 
 }
 
-void destroyAsteroid(Asteroid *asteroid){
-    SDL_DestroyTexture(asteroid->astTexture);
-    free(asteroid);
+void destroyAsteroid(Asteroid *asteroid, Asteroid **asteroids, int deleteIndex, int *currentasteroidAmount){
+
+    // SDL_DestroyTexture(asteroids[deleteIndex]->astTexture);
+    
+    // printf("\n");
+    // printf("%s\n", asteroids[deleteIndex]->name);
+    // printf("\n");
+
+    // printf("\n");
+    
+
+    free(asteroids[deleteIndex]);
+    asteroids[deleteIndex] = NULL;
+
+
+    updateAsteroidArray(asteroids, deleteIndex, *currentasteroidAmount);
+
+    (*currentasteroidAmount)--;
+
+    // printf("\n");
+
+
+    // for (int i = 0; i < *currentasteroidAmount; i++)
+    // {
+
+    //     puts(asteroids[i]->name);
+    // }
+    
+
+    // printf("\n");
+
+    // printf("Hello World\n");
+    // for (int i = 0; i < *currentasteroidAmount; i++)
+    // {
+    //     puts(asteroids[i]->name);
+    // }
+
 }
