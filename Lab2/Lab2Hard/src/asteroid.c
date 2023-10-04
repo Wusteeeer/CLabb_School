@@ -242,7 +242,7 @@ void destroyAsteroid(Asteroid *asteroid, Asteroid **asteroids, int deleteIndex, 
     
 
     free(asteroids[deleteIndex]);
-    asteroids[deleteIndex] = NULL;
+    // asteroids[deleteIndex] = NULL;
 
 
     updateAsteroidArray(asteroids, deleteIndex, *currentasteroidAmount);

@@ -7,7 +7,7 @@ CC = gcc
 #TODO: It cannot find the asteroid file for some reason (i think)
 
 #If more files are created then add them as objects and C-files here
-OBJ = Lab2HardV.o Ship.o asteroid.o labMath.o bullet.o score.o
+OBJ = Lab2HardV.o Ship.o asteroid.o labMath.o bullet.o UIText.o
 
 INCLUDE = -IC:\msys64\mingw64\include -I${INCDIR}
 
@@ -24,7 +24,7 @@ Lab2HV : ${OBJ}
 # %.o : ${SRCDIR}/%.c ${INCDIR}/%.h
 # 	${CC} ${CFLAGS} ${SRCDIR}/%.c
 
-Lab2HardV.o : ${SRCDIR}/Lab2HardV.c ${INCDIR}/Ship.h ${INCDIR}/asteroid.h ${INCDIR}/labMath.h ${INCDIR}/bullet.h ${INCDIR}/score.h
+Lab2HardV.o : ${SRCDIR}/Lab2HardV.c ${INCDIR}/Ship.h ${INCDIR}/asteroid.h ${INCDIR}/labMath.h ${INCDIR}/bullet.h ${INCDIR}/score.h ${INCDIR}/text.h
 	@${CC} ${CFLAGS} ${SRCDIR}/Lab2HardV.c
 
 
@@ -41,8 +41,8 @@ labMath.o : ${SRCDIR}/labMath.c ${INCDIR}/labMath.h
 bullet.o : ${SRCDIR}/bullet.c ${INCDIR}/bullet.h ${INCDIR}/labMath.h
 	@${CC} ${CFLAGS} ${SRCDIR}/bullet.c
 
-score.o : ${SRCDIR}/score.c ${INCDIR}/score.h
-	@${CC} ${CFLAGS} ${SRCDIR}/score.c
+UIText.o : ${SRCDIR}/UIText.c ${INCDIR}/score.h ${INCDIR}/text.h
+	@${CC} ${CFLAGS} ${SRCDIR}/UIText.c
 
 .PHONY : clean
 

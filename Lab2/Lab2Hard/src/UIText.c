@@ -3,12 +3,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "score.h"
+#include "text.h"
+
+#pragma region Score
 
 struct score{
 
     float points;
 
-    char text[10];
+    char text[100];
 
     SDL_Renderer *renderer;
     SDL_Color color;
@@ -34,8 +37,9 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
 
     score->font = TTF_OpenFont("PixelFont.ttf", fontSize);
 
-    createTextTexture(score, score->points);
+    createScoreTexture(score, score->points);
 
+ 
     if(!score->texture){
         printf("%s\n", SDL_GetError());
         return NULL;
@@ -45,7 +49,7 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
 
 }
 
-void createTextTexture(Score *score, int points){
+void createScoreTexture(Score *score, int points){
     
     sprintf(score->text, "%d", points);
 
@@ -80,11 +84,90 @@ void changeScore(Score *score, float points){
     
     score->points += points;
 
-    createTextTexture(score, score->points);
+    createScoreTexture(score, score->points);
     
 }
 
 void destroyScore(Score *score){
     SDL_DestroyTexture(score->texture);
     free(score);
+}
+
+#pragma endregion
+
+struct text{
+
+    char text[100];
+    
+    SDL_Renderer *renderer;
+    SDL_Rect rect;
+    SDL_Color color;
+    SDL_Texture *texture;   
+
+
+    TTF_Font *font;  
+
+};
+
+
+Text *createText(float x, float y, SDL_Renderer *renderer, char str[], int fontSize, SDL_Color color){
+
+    Text *text = malloc(sizeof(struct text));
+
+    text->rect.x = x;
+    text->rect.y = y;
+
+    text->renderer = renderer;
+
+    text->color = color;
+    text->font = TTF_OpenFont("PixelFont.ttf", fontSize);
+
+    
+    createTextTexture(text, str);
+
+
+    return text;
+
+}
+
+
+void createTextTexture(Text *text, char str[]){
+
+    strcpy(text->text, str);
+
+    SDL_Surface *surface;
+    surface = TTF_RenderUTF8_Blended(text->font, text->text, text->color);
+
+    if(!surface){
+        printf("%s\n", SDL_GetError());
+        return;
+    }
+
+    text->texture = SDL_CreateTextureFromSurface(text->renderer, surface);
+    SDL_FreeSurface(surface);
+
+    if(!text->texture){
+
+        printf("%s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_QueryTexture(text->texture, NULL, NULL, &(text->rect.w), &(text->rect.h));
+
+
+}
+
+
+void printText(Text *text){
+
+    SDL_RenderCopyEx(text->renderer, text->texture, NULL, &(text->rect), 0, NULL, SDL_FLIP_NONE);
+
+}
+
+
+void destroyText(Text *text){
+
+    SDL_DestroyTexture(text->texture);
+    free(text);
+
 }

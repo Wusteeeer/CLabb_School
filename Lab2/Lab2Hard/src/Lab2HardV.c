@@ -9,6 +9,7 @@
 #include "labMath.h"
 #include "bullet.h"
 #include "score.h"
+#include "text.h"
 #define MAXBULLETAMOUNT 2
 #define FONTSIZE 50
 #define MAXASTEROIDAMOUNT 10
@@ -17,15 +18,17 @@
 //make highscore (this includes file stuff (spooky)), 
 //if time: make it juicy
 
-void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction, bool *isRunning);
+void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);
 
 void asteroidHandler(Asteroid **asteroid, SDL_Renderer *renderer, int windowW, int windowH, int *currentasteroidAmount);
 
 void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_Renderer *renderer, int windowW, int windowH, Ship *ship);
 
-void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, SDL_Window *window, int *currentasteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount);
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, SDL_Window *window, int *currentasteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount, bool *isRunning);
 
-void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship);
+void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, bool *isRunning);
+void restart(Ship *ship, int *currentAsteroidAmount, int *currentBulletAmount, Bullet **bullets, Asteroid **asteroids, Score *score, bool *started, bool *isRunning);
+void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRunning);
 
 int main(int argv, char** args)
 {      
@@ -57,12 +60,19 @@ int main(int argv, char** args)
     float vel = 0.0f, acc = 0.00015f, friction = 0.0001f;
     
     Ship *ship = createShip(startX, startY, windowW, windowH, renderer);
-
+    
     #pragma endregion
 
-    bool isRunning = true;
+    bool start = false;
+    bool isRunning = false;
+    SDL_Color color = {255, 255, 255};
 
-    Asteroid *asteroids[MAXASTEROIDAMOUNT];
+
+    //It never allocates enough memory on start so I think it at some point when trying to allocate more memory it overlapped 
+    //with the eventsystem which led it to crash because it couldn't couldn't be allocated.
+    //This would also explain why even and odd numbers made a difference because the asteroid struct probably leaves some
+    //Padding making it possible to create a few extra before crashing
+    Asteroid *asteroids[100];
 
     int currentAsteroidAmount = 0;
     int totalAsteroidAmount = 0;
@@ -75,16 +85,54 @@ int main(int argv, char** args)
     
     Bullet *bullets[MAXBULLETAMOUNT];
 
+    Text *startText = createText(windowW / 2 - 175, windowH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
+    isRunning = true;
 
-    SDL_Color color = {255, 255, 255};
+    while(!start){
+
+        
+
+        startMenu(&start, event, renderer, window, ship, acc, friction, startText, &isRunning);
+
+
+    }
+
+    destroyText(startText);
+
     Score *score = createScore(windowW / 2, 10, renderer, color, 0, FONTSIZE);
     float points = 0;
 
-    while(1)
+    
+    while(isRunning)
     {
         
 
+        while (SDL_PollEvent(&event))
+        {
 
+         
+
+            switch (event.type){
+                case SDL_QUIT:
+
+                    gameOver(renderer, window, ship, &isRunning);
+                    return 0;
+
+                break;
+                case SDL_KEYDOWN:
+
+                    if (event.key.keysym.sym == SDLK_ESCAPE)
+                    {
+                        gameOver(renderer, window, ship, &isRunning);
+                        return 0;
+                    }            
+                    
+                    
+                break;
+
+            }
+        
+        }
 
         collisionHandler(
             ship, 
@@ -96,7 +144,8 @@ int main(int argv, char** args)
             window, 
             &currentAsteroidAmount, 
             &currentBulletAmount, 
-            &totalAsteroidAmount
+            &totalAsteroidAmount,
+            &isRunning
         );
 
    
@@ -116,7 +165,7 @@ int main(int argv, char** args)
 
         asteroidHandler(asteroids, renderer, windowW, windowH, &currentAsteroidAmount);
        
-        shipHandler(ship, renderer, event, window, acc, friction, &isRunning);
+        shipHandler(ship, renderer, event, window, acc, friction);
         bulletHandler(bullets, &currentBulletAmount, &shot, renderer, windowW, windowH, ship);
 
         printScore(score);
@@ -133,11 +182,11 @@ int main(int argv, char** args)
 
 }
 
-void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship){
+void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRunning){
 
 
     deleteShip(ship);
-
+    *isRunning = false;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -145,17 +194,23 @@ void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship){
 
 }
 
-void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction, bool *isRunning){
+void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, bool *isRunning){
 
-    while (SDL_PollEvent(&event))
-    {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-         
+    SDL_RenderClear(renderer);
 
+    printText(startText);
+
+    shipHandler(ship, renderer, event, window, acc, friction);
+
+    SDL_RenderPresent(renderer);
+
+    while(SDL_PollEvent(&event)){
         switch (event.type){
             case SDL_QUIT:
 
-                gameOver(renderer, window, ship);
+                gameOver(renderer, window, ship, isRunning);
                 return;
 
             break;
@@ -163,7 +218,12 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window
 
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                    gameOver(renderer, window, ship);
+                    gameOver(renderer, window, ship, isRunning);
+                    return;
+                }
+
+                if(event.key.keysym.sym == SDLK_SPACE){
+                    *started = true;
                     return;
                 }            
                     
@@ -171,8 +231,14 @@ void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window
             break;
 
         }
-        
+            
     }
+
+}
+
+void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction){
+
+    
   
     const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
     if(keyboard_state_array[SDL_SCANCODE_SPACE])
@@ -290,7 +356,7 @@ void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int windowW, 
 
 }
 
-void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, SDL_Window *window, int *currentasteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount)
+void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, SDL_Window *window, int *currentasteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount, bool *isRunning)
 {
 
     for (int i = 0; i < *currentasteroidAmount; i++)
@@ -298,7 +364,7 @@ void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score 
         
         if(collision(getShipRect(ship), getAstRect(asteroids[i]))){
 
-            gameOver(renderer, window, ship);
+            gameOver(renderer, window, ship, isRunning);
                
                 
             return;
