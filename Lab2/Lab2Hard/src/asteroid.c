@@ -124,7 +124,7 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
         angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
         asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
-        asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, rand() % 2 + 2, renderer, currentAsteroidAmount, totalAsteroidAmount);
+        asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, rand() % 1 + 3, renderer, currentAsteroidAmount, totalAsteroidAmount);
 
 
     
@@ -232,39 +232,11 @@ void updateAsteroid(Asteroid **asteroids, int *currentAsteroidAmount, int delete
 
 void destroyAsteroid(Asteroid *asteroid, Asteroid **asteroids, int deleteIndex, int *currentasteroidAmount){
 
-    // SDL_DestroyTexture(asteroids[deleteIndex]->astTexture);
-    
-    // printf("\n");
-    // printf("%s\n", asteroids[deleteIndex]->name);
-    // printf("\n");
-
-    // printf("\n");
-    
-
     free(asteroids[deleteIndex]);
-    // asteroids[deleteIndex] = NULL;
 
 
     updateAsteroidArray(asteroids, deleteIndex, *currentasteroidAmount);
 
     (*currentasteroidAmount)--;
-
-    // printf("\n");
-
-
-    // for (int i = 0; i < *currentasteroidAmount; i++)
-    // {
-
-    //     puts(asteroids[i]->name);
-    // }
-    
-
-    // printf("\n");
-
-    // printf("Hello World\n");
-    // for (int i = 0; i < *currentasteroidAmount; i++)
-    // {
-    //     puts(asteroids[i]->name);
-    // }
 
 }

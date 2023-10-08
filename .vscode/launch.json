@@ -9,14 +9,14 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "c:/Cprogram/Lab2/Lab2Hard",
-      "program": "c:/Cprogram/Lab2/Lab2Hard/Lab2HV",
+      "program": "c:/Cprogram/Lab2/Lab2Hard/Lab2HV.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
           "text": "-enable-pretty-printing",
-          "ignoreFailures": false
+          "ignoreFailures": true
         }
       ]
     }

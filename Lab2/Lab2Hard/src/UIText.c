@@ -88,6 +88,14 @@ void changeScore(Score *score, float points){
     
 }
 
+void setScore(Score *score, float points){
+    
+    score->points = points;
+
+    createScoreTexture(score, score->points);
+    
+}
+
 void destroyScore(Score *score){
     SDL_DestroyTexture(score->texture);
     free(score);

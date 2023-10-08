@@ -140,6 +140,26 @@ SDL_Rect getShipRect(Ship *ship){
     return ship->shipRect;    
 }
 
+void setPosition(Ship *ship, float x, float y){
+    
+    ship->x = x;
+    ship->y = y;
+
+    updateShip(ship);
+
+}
+
+void stopShip(Ship *ship){
+
+    ship->velocity = 0;
+
+    ship->moveVect[0] = ship->moveVect[1] = 0;
+
+    ship->dx = ship->dy = 0;
+    
+    ship->angle = 0;
+}
+
 double *getMoveDir(Ship *ship){
     return ship->moveVect;
 }
