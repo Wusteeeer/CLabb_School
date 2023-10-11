@@ -9,7 +9,7 @@ typedef struct complex{
 }Complex;
 
 void printComplex(Complex comp);
-void multComplex(Complex *comp1, float mult);
+void multiplyComplex(Complex *Pcomp, float factor);
 
 int main(){
 
@@ -19,8 +19,8 @@ int main(){
     printComplex(c1);
     printComplex(c2);
 
-    multComplex(&c1, -2.5);
-    multComplex(&c2, -1.0);
+    multiplyComplex(&c1, -2.5);
+    multiplyComplex(&c2, -1.0);
 
     printComplex(c1);
     printComplex(c2);
@@ -35,15 +35,17 @@ void printComplex(Complex comp){
         printf("%.4f + %.4fi\n", comp.real, comp.imaginary);
 
     }else{
+
         printf("%.4f - %.4fi\n", comp.real, comp.imaginary * -1);
+        
     }
 
 }
 
 
-void multComplex(Complex *comp, float mult){
+void multiplyComplex(Complex *Pcomp, float factor){
 
-    comp->real *= mult;
-    comp->imaginary *= mult;
+    Pcomp->real *= factor;
+    Pcomp->imaginary *= factor;
 
 }

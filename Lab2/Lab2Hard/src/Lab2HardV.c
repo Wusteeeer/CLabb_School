@@ -17,8 +17,8 @@
 #define SCREENH 700
 #define MAXHIGHSCORE 5
 
-//TODO: Make main menu (make a function to reset everything, and one to start everything then just call them (just make the player press space to start)), 
-//make highscore (this includes file stuff (spooky)), 
+//TODO: Sometimes it crashes because of the highscore file (it says "No File Existed" in the terminal before crashing)
+//Also sometimes when you quit it doesnt actually quit all the way
 //if time: make it juicy
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);

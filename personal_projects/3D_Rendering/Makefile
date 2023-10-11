@@ -1,8 +1,8 @@
 INCDIR = ./include
 SRCDIR = ./src
 
-OBJ = cube.o matrix.o vector.o
-INCLUDE = matrix.h vector.h
+OBJ = mainC.o matrix.o vector.o objects.o
+INCLUDE = matrix.h vector.h objects.h
 CC = gcc
 
 INCLUDE = -IC:\msys64\mingw64\include -I${INCDIR}
@@ -16,7 +16,7 @@ run : ${OBJ}
 	@${CC} -o $@ $^ ${LDFLAGS}
 
 
-cube.o :  ${SRCDIR}/cube.c ${INCDIR}/matrix.h ${INCDIR}/vector.h
+mainC.o :  ${SRCDIR}/mainC.c ${INCDIR}/matrix.h ${INCDIR}/vector.h ${INCDIR}/objects.h
 	@${CC} ${CFLAGS} $<
 
 vector.o :  ${SRCDIR}/vector.c ${INCDIR}/vector.h
@@ -25,3 +25,5 @@ vector.o :  ${SRCDIR}/vector.c ${INCDIR}/vector.h
 matrix.o :  ${SRCDIR}/matrix.c ${INCDIR}/vector.h ${INCDIR}/matrix.h 
 	@${CC} ${CFLAGS} $<
 
+objects.o : ${SRCDIR}/objects.c ${INCDIR}/vector.h ${INCDIR}/matrix.h  ${INCDIR}/objects.h
+	@${CC} ${CFLAGS} $<

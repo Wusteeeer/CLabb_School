@@ -67,5 +67,6 @@
     "time.h": "c",
     "stdio.h": "c",
     "typeinfo": "c"
-  }
+  },
+  "C_Cpp_Runner.msvcSecureNoWarnings": false
 }
