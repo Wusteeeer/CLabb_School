@@ -35,7 +35,14 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
 
     score->points = points;
 
-    score->font = TTF_OpenFont("PixelFont.ttf", fontSize);
+    printf("%.2f\n", score->points);
+
+    score->font = TTF_OpenFont("C:/Cprogram/Lab2/Lab2Hard/PixelFont.ttf", fontSize);
+
+    if(!score->font){
+        printf("Could not find font!\n");
+        return NULL;
+    }
 
     createScoreTexture(score, score->points);
 
@@ -76,7 +83,8 @@ void createScoreTexture(Score *score, int points){
 
 void printScore(Score *score){
     
-    SDL_RenderCopyEx(score->renderer, score->texture, NULL, &(score->rect), 0, NULL, SDL_FLIP_NONE);
+    if(score != NULL)
+        SDL_RenderCopyEx(score->renderer, score->texture, NULL, &(score->rect), 0, NULL, SDL_FLIP_NONE);
 
 }
 
@@ -128,11 +136,17 @@ Text *createText(float x, float y, SDL_Renderer *renderer, char str[], int fontS
     text->renderer = renderer;
 
     text->color = color;
-    text->font = TTF_OpenFont("PixelFont.ttf", fontSize);
+    text->font = TTF_OpenFont("C:/Cprogram/Lab2/Lab2Hard/PixelFont.ttf", fontSize);
 
+    if(!text->font){
+        return NULL;
+    }
     
     createTextTexture(text, str);
 
+    if(!text->texture){
+        return NULL;
+    }
 
     return text;
 
@@ -168,7 +182,9 @@ void createTextTexture(Text *text, char str[]){
 
 void printText(Text *text){
 
-    SDL_RenderCopyEx(text->renderer, text->texture, NULL, &(text->rect), 0, NULL, SDL_FLIP_NONE);
+    if(text != NULL)
+        SDL_RenderCopyEx(text->renderer, text->texture, NULL, &(text->rect), 0, NULL, SDL_FLIP_NONE);
+
 
 }
 

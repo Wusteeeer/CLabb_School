@@ -17,8 +17,7 @@
 #define SCREENH 700
 #define MAXHIGHSCORE 5
 
-//TODO: Sometimes it crashes because of the highscore file (it says "No File Existed" in the terminal before crashing)
-//Also sometimes when you quit it doesnt actually quit all the way
+//TODO: Sometimes when you quit it doesnt actually quit all the way
 //if time: make it juicy
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);
@@ -115,7 +114,6 @@ int main(int argv, char** args)
                 
                 
                 startText = createText(SCREENW / 2 - 175, SCREENH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
-                
 
                 score = createScore(SCREENW / 2, 10, renderer, color, 0, FONTSIZE);
 
@@ -209,7 +207,7 @@ int main(int argv, char** args)
 void writeFile(int *highScoreNumbers){
 
     FILE *fp;
-    fp = fopen("highscores", "wb");
+    fp = fopen("C:/Cprogram/Lab2/Lab2Hard/highscores", "wb");
     if(fp == NULL){
         printf("Could not open file of name highscores\n");
         exit(EXIT_FAILURE);
@@ -228,15 +226,17 @@ void writeFile(int *highScoreNumbers){
 void readFile(Score **highScores, SDL_Renderer *renderer, SDL_Color color, int *highScoreNumbers){
     
     FILE *fp;
-    fp = fopen("highscores", "rb");
+    fp = fopen("C:/Cprogram/Lab2/Lab2Hard/highscores", "rb");
 
     if(fp != NULL){
         
         
         for (int i = 0; i < MAXHIGHSCORE; i++)
         {
+
             fread(&highScoreNumbers[i], sizeof(int), MAXHIGHSCORE, fp);
             highScores[i] = createScore(SCREENW / 2, 50 * i, renderer, color, highScoreNumbers[i], FONTSIZE - 10);
+            
         }
     
 
@@ -348,9 +348,8 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
     }
     
 
-    shipHandler(ship, renderer, event, window, acc, friction);
+    // shipHandler(ship, renderer, event, window, acc, friction);
 
-    SDL_RenderPresent(renderer);
 
     while(SDL_PollEvent(&event)){
         switch (event.type){
@@ -381,6 +380,25 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
         }
             
     }
+
+    const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
+
+    if(keyboard_state_array[SDL_SCANCODE_A]){
+        rotateShip(ship, -0.1f);
+    }
+
+    if(keyboard_state_array[SDL_SCANCODE_D]){
+        rotateShip(ship, 0.1f);
+    }
+
+    drawShip(ship, renderer);
+
+    moveShip(ship);
+    updateShip(ship);
+
+    drawShip(ship, renderer);
+    
+    SDL_RenderPresent(renderer);
 
 }
 

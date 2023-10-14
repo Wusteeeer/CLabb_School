@@ -93,10 +93,6 @@ void drawPlane(Plane *pl){
     r4.w = 10;
     r4.h = 10;
 
-    SDL_RenderFillRect(pl->renderer, &r1);
-    SDL_RenderFillRect(pl->renderer, &r2);
-    SDL_RenderFillRect(pl->renderer, &r3);
-    SDL_RenderFillRect(pl->renderer, &r4);
 
     SDL_RenderDrawLine(pl->renderer, r1.x, r1.y, r2.x, r2.y);
     SDL_RenderDrawLine(pl->renderer, r1.x, r1.y, r3.x, r3.y);
@@ -315,5 +311,5 @@ void rotateSquareZ(Square *sq, float angle){
     sq->p6 = rotateZ(sq->p6, angle);
     sq->p7 = rotateZ(sq->p7, angle);
     sq->p8 = rotateZ(sq->p8, angle);
-    
+
 }

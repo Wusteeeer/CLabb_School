@@ -33,7 +33,7 @@ Bullet *createBullet(float x, float y, float vel, double *dir, double angle, flo
 
     bullet->bulletRenderer = renderer;
 
-    SDL_Surface *surface = IMG_Load("bullet.png");
+    SDL_Surface *surface = IMG_Load("C:/Cprogram/Lab2/Lab2Hard/bullet.png");
     if(!surface){
         printf("ERROR: %s\n", SDL_GetError());
         return NULL;

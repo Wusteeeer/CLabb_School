@@ -4,10 +4,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <time.h>
+#include <string.h>
 #include "Ship.h"
 #include "labMath.h"
 #define NO_STDIO_REDIRECT
 
+const char *dir = "C:/Cprogram/Lab2/Lab2Hard/";
 
 struct ship{
 
@@ -50,11 +52,11 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
     #pragma region TextureStuff
 
     //Loads a image
-    SDL_Surface *surface = IMG_Load("Spaceship.png");
+    SDL_Surface *surface = IMG_Load("C:/Cprogram/Lab2/Lab2Hard/Spaceship.png");
 
     //Makes sure the png exists and that there was enough memory
     if(!surface){
-        printf("ERROR:%s\n", SDL_GetError());
+        printf("Could Not create Ship surface:%s\n", SDL_GetError());
         return NULL;
     }
     
@@ -66,7 +68,7 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
 
     //To make sure that enough memory existed for the texture and that the conversion went well
     if(!shp->shipTexture){
-        printf("ERROR:%s\n", SDL_GetError());
+        printf("Could Not create Ship texture:%s\n", SDL_GetError());
         return NULL;
     }
 

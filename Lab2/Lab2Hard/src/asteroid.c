@@ -68,7 +68,7 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
     ast->astRenderer = renderer;
 
-    SDL_Surface *surface = IMG_Load("asteroid.png");
+    SDL_Surface *surface = IMG_Load("C:/Cprogram/Lab2/Lab2Hard/asteroid.png");
     if(!surface){
         printf("%s\n", SDL_GetError());
         return NULL;
@@ -124,7 +124,7 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
         angle = atan2((windowH / 2) - pos[1], (windowW / 2) - pos[0]) * 180 / M_PI;
 
         asteroids[*currentAsteroidAmount] = malloc(sizeof(struct asteroid));
-        asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, rand() % 1 + 3, renderer, currentAsteroidAmount, totalAsteroidAmount);
+        asteroids[*currentAsteroidAmount] = createAsteroid(pos[0], pos[1], vel, angle + rand() % 20 - 10, windowW, windowH, rand() % 2 + 2, renderer, currentAsteroidAmount, totalAsteroidAmount);
 
 
     
@@ -138,7 +138,7 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
 void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
 
     
-    if(!ast){
+    if(ast == NULL){
         return;
     }
 

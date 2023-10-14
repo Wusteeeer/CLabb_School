@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Cprogram/personal_projects/3D_Rendering/src",
-      "program": "c:/Cprogram/personal_projects/3D_Rendering/run.exe",
+      "cwd": "c:/Cprogram/Lab2/Lab2Hard/src",
+      "program": "c:/Cprogram/Lab2/Lab2Hard/Lab2HV.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -1,5 +1,6 @@
 INCDIR = ./include
 SRCDIR = ./src
+ROOTDIR = ..
 
 OBJ = mainC.o matrix.o vector.o objects.o
 INCLUDE = matrix.h vector.h objects.h
@@ -16,14 +17,14 @@ run : ${OBJ}
 	@${CC} -o $@ $^ ${LDFLAGS}
 
 
-mainC.o :  ${SRCDIR}/mainC.c ${INCDIR}/matrix.h ${INCDIR}/vector.h ${INCDIR}/objects.h
+mainC.o :  ${SRCDIR}/mainC.c ${ROOTDIR}/matrix.h ${ROOTDIR}/vector.h ${INCDIR}/objects.h
 	@${CC} ${CFLAGS} $<
 
-vector.o :  ${SRCDIR}/vector.c ${INCDIR}/vector.h
+vector.o :  ${ROOTDIR}/vector.c ${ROOTDIR}/vector.h
 	@${CC} ${CFLAGS} $<
 
-matrix.o :  ${SRCDIR}/matrix.c ${INCDIR}/vector.h ${INCDIR}/matrix.h 
+matrix.o :  ${ROOTDIR}/matrix.c ${ROOTDIR}/vector.h ${ROOTDIR}/matrix.h 
 	@${CC} ${CFLAGS} $<
 
-objects.o : ${SRCDIR}/objects.c ${INCDIR}/vector.h ${INCDIR}/matrix.h  ${INCDIR}/objects.h
+objects.o : ${SRCDIR}/objects.c ${ROOTDIR}/vector.h ${ROOTDIR}/matrix.h  ${INCDIR}/objects.h
 	@${CC} ${CFLAGS} $<

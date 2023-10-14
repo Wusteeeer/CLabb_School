@@ -5,6 +5,7 @@
 #include "matrix.h"
 
 
+
 struct matrix{
 
     int xSize, ySize;
@@ -57,7 +58,7 @@ void printMatrix(Matrix *mat){
 
 }
 
-Matrix *vect2DToMat(Vector2D vect)
+Matrix *vect2DToMat(Vector2 vect)
 {
 
     Matrix *mat = malloc(sizeof(struct matrix));
@@ -76,7 +77,7 @@ Matrix *vect2DToMat(Vector2D vect)
     return mat;   
 }
 
-Matrix *vect3DToMat(Vector3D vect)
+Matrix *vect3DToMat(Vector3 vect)
 {
     Matrix *mat = malloc(sizeof(struct matrix));
 
@@ -97,17 +98,18 @@ Matrix *vect3DToMat(Vector3D vect)
 
 }
 
-Vector3D matToVect3D(Matrix *mat){
+Vector3 matToVect3D(Matrix *mat){
 
-    Vector3D vect = {mat->mat[0][0], mat->mat[1][0], mat->mat[2][0]};
+    Vector3 vect = {mat->mat[0][0], mat->mat[1][0], mat->mat[2][0]};
 
     return vect;
 
+
 }
 
-Vector2D matToVect2D(Matrix *mat){
+Vector2 *matToVect2D(Matrix *mat){
 
-    Vector2D vect = {mat->mat[0][0], mat->mat[1][0]};
+    Vector2 *vect = createVector2(mat->mat[0][0], mat->mat[1][0]);
 
     return vect;
 }
@@ -306,5 +308,32 @@ Matrix *rotateY(Matrix *mat, float angle){
     Matrix *multRotMat = matrixMult(rotationMatrix, mat);
 
     return multRotMat;
+
+}
+
+Vector2 *rotateVect2(Vector2 v, float angle){
+
+    float rotArr[][2] = {
+
+        {cos(angle), -sin(angle)},
+        {sin(angle), cos(angle)}
+
+    };
+
+    float **pRotArr = arrToPByTwo(rotArr, 2);
+
+    Matrix *vectorMat = vect2DToMat(v);
+
+    printMatrix(vectorMat);
+
+    Matrix *rotationMatrix = createMatrix(pRotArr, 2, 2);
+
+    printMatrix(rotationMatrix);
+
+    Matrix *multRotMat = matrixMult(rotationMatrix, vectorMat);
+
+    printMatrix(multRotMat);
+
+    return matToVect2D(multRotMat);
 
 }
