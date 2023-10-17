@@ -17,7 +17,7 @@
 #define SCREENH 700
 #define MAXHIGHSCORE 5
 
-//TODO: Sometimes when you quit it doesnt actually quit all the way and also it still crashes :(
+//TODO: Migh have fixed the crashing but more testing is needed
 //if time: make it juicy
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);
@@ -196,14 +196,15 @@ int main(int argv, char** args)
 
 
         
-        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
+        
        
         shipHandler(ship, renderer, event, window, acc, friction);
         bulletHandler(bullets, &currentBulletAmount, &shot, renderer, ship);
+        
 
         printScore(score);
 
-
+        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
         SDL_RenderPresent(renderer);
 
 
@@ -262,7 +263,7 @@ void readFile(Score **highScores, SDL_Renderer *renderer, SDL_Color color, int *
 
     for (int i = 0; i < MAXHIGHSCORE; i++)
     {
-        highScores[i] = createScore(SCREENW / 2, 50 * i, renderer, color, 0, FONTSIZE - 10);
+        highScores[i] = createScore(SCREENW / 2, 50 * i + 75, renderer, color, 0, FONTSIZE - 10);
     }
 
     fclose(fp);
@@ -312,7 +313,6 @@ void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRu
     updateHighScore(highScoreNumbers, points, highscores);
 
     writeFile(highScoreNumbers);
-    // deleteShip(ship);
     *isRunning = false;
 
     SDL_DestroyRenderer(renderer);
