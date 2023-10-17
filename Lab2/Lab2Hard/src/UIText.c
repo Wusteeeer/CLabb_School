@@ -37,7 +37,7 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
 
     printf("%.2f\n", score->points);
 
-    score->font = TTF_OpenFont("C:/Cprogram/Lab2/Lab2Hard/PixelFont.ttf", fontSize);
+    score->font = TTF_OpenFont("./PixelFont.ttf", fontSize);
 
     if(!score->font){
         printf("Could not find font!\n");
@@ -136,7 +136,7 @@ Text *createText(float x, float y, SDL_Renderer *renderer, char str[], int fontS
     text->renderer = renderer;
 
     text->color = color;
-    text->font = TTF_OpenFont("C:/Cprogram/Lab2/Lab2Hard/PixelFont.ttf", fontSize);
+    text->font = TTF_OpenFont("./PixelFont.ttf", fontSize);
 
     if(!text->font){
         return NULL;

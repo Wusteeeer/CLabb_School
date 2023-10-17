@@ -52,7 +52,7 @@ Ship *createShip(float x, float y, int screenWidth, int screenHeight, SDL_Render
     #pragma region TextureStuff
 
     //Loads a image
-    SDL_Surface *surface = IMG_Load("C:/Cprogram/Lab2/Lab2Hard/Spaceship.png");
+    SDL_Surface *surface = IMG_Load("./Spaceship.png");
 
     //Makes sure the png exists and that there was enough memory
     if(!surface){

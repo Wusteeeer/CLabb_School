@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -23,6 +24,10 @@ struct asteroid{
     SDL_Renderer *astRenderer;
     
 };
+
+void initAstArr(Asteroid **ast, int size){
+    ast = malloc(sizeof(struct asteroid*) * size);
+}
 
 SDL_Rect getAstRect(Asteroid *ast){
 
@@ -68,7 +73,7 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
 
     ast->astRenderer = renderer;
 
-    SDL_Surface *surface = IMG_Load("C:/Cprogram/Lab2/Lab2Hard/asteroid.png");
+    SDL_Surface *surface = IMG_Load("./asteroid.png");
     if(!surface){
         printf("%s\n", SDL_GetError());
         return NULL;
@@ -142,6 +147,7 @@ void drawAsteroid(Asteroid *ast, SDL_Renderer *renderer){
         return;
     }
 
+
     SDL_RenderCopyEx(renderer, ast->astTexture, NULL, &(ast->astRect), 0, NULL, SDL_FLIP_NONE);
 
 }
@@ -155,6 +161,15 @@ void splitAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmou
 
         
     }
+
+
+    // for (int i = 0; i < *currentAsteroidAmount; i++)
+    // {
+
+    //     puts(asteroids[i]->name);
+
+    // }
+    
 
 
 
@@ -178,16 +193,9 @@ void updateAsteroidArray(Asteroid **asteroids, int deleteIndex, int currentAster
     
     for (int i = deleteIndex; i < currentAsteroidAmount - 1; i++) 
     {
-        // printf("%d, %s = %s\n", deleteIndex, asteroids[i]->name, asteroids[i + 1]->name);
         asteroids[i] = asteroids[i + 1];
     
     }
-
-    // SDL_DestroyTexture(asteroids[currentAsteroidAmount]->astTexture);
-    // free(asteroids[currentAsteroidAmount]);
-
-    //TODO: I need to figure out a way to free the last element. Otherwise the last one will be the same as the second-to-last one
-    //Which makes the currentAsteroidAmount not the correct size. But when I try to free it the game crashes.
     
 }
 
@@ -197,12 +205,6 @@ char *getAstName(Asteroid *ast){
 
 void updateAsteroid(Asteroid **asteroids, int *currentAsteroidAmount, int deleteIndex){
 
-    // printf("%d\n", *currentAsteroidAmount);
-    // puts(asteroids[]->name);
-    // for (int i = 0; i < *currentAsteroidAmount; i++)
-    // {
-    //     printf("%s\n", asteroids[i]->name);
-    // }
 
     if(deleteIndex >= *currentAsteroidAmount){
         return;
@@ -232,6 +234,7 @@ void updateAsteroid(Asteroid **asteroids, int *currentAsteroidAmount, int delete
 
 void destroyAsteroid(Asteroid *asteroid, Asteroid **asteroids, int deleteIndex, int *currentasteroidAmount){
 
+    SDL_DestroyTexture(asteroids[deleteIndex]->astTexture);
     free(asteroids[deleteIndex]);
 
 

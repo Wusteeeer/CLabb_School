@@ -17,7 +17,7 @@
 #define SCREENH 700
 #define MAXHIGHSCORE 5
 
-//TODO: Sometimes when you quit it doesnt actually quit all the way
+//TODO: Sometimes when you quit it doesnt actually quit all the way and also it still crashes :(
 //if time: make it juicy
 
 void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);
@@ -28,7 +28,7 @@ void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_R
 
 void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score *score, float *points, SDL_Renderer *renderer, SDL_Window *window, int *currentasteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount, bool *started, int *highscoreNumbers, Score **highscores);
 
-void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, Score **highScores, int *highScoreNumbers, bool *isRunning, bool *created, float points);
+void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, Text *highScoreText, Score **highScores, int *highScoreNumbers, bool *isRunning, bool *created, float points);
 void restart(Ship *ship, int *currentAsteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount, Bullet **bullets, Asteroid **asteroids, Score *score, bool *started, float points, int *highscoreNumbers, Score **highscores);
 void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRunning, int *highScoreNumbers, float points, Score **highscores);
 
@@ -74,6 +74,7 @@ int main(int argv, char** args)
     SDL_Color color = {255, 255, 255};
 
     Asteroid *asteroids[100];
+    initAstArr(asteroids, 100);
 
     int currentAsteroidAmount = 0;
     int totalAsteroidAmount = 0;
@@ -87,6 +88,7 @@ int main(int argv, char** args)
     Bullet *bullets[MAXBULLETAMOUNT];
 
     Text *startText;
+    Text *highScoreText;
     Score *score, *highScores[MAXHIGHSCORE];
 
     int *highScoreNumbers = malloc(sizeof(int) * MAXHIGHSCORE);
@@ -108,27 +110,10 @@ int main(int argv, char** args)
     while(isRunning)
     {
 
-        while(!start){  
-
-            if(create){
-                
-                
-                startText = createText(SCREENW / 2 - 175, SCREENH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
-
-                score = createScore(SCREENW / 2, 10, renderer, color, 0, FONTSIZE);
-
-
-                create = false;
-            }
-
-            startMenu(&start, event, renderer, window, ship, acc, friction, startText, highScores, highScoreNumbers, &isRunning, &create, points);
-        }
-        
-
         while (SDL_PollEvent(&event))
         {
 
-         
+            
 
             switch (event.type){
                 case SDL_QUIT:
@@ -152,35 +137,29 @@ int main(int argv, char** args)
         
         }
 
+        while(!start){  
 
-   
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            if(create){
+                
+                
+                startText = createText(SCREENW / 2 - 175, SCREENH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
+                highScoreText = createText(SCREENW / 2 - 40, 0, renderer, "Highscores:", FONTSIZE - 10, color);
 
-               
-
-
-        spawnContinuousAsteroids(asteroids, renderer, 0.1f, 0.05f, &currentAsteroidAmount, MAXASTEROIDAMOUNT, SCREENW, SCREENH, &totalAsteroidAmount);
-        
-
-
-        SDL_RenderClear(renderer);
-
-     
- 
-
-        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
-       
-        shipHandler(ship, renderer, event, window, acc, friction);
-        bulletHandler(bullets, &currentBulletAmount, &shot, renderer, ship);
-
-        printScore(score);
+                score = createScore(SCREENW / 2, 10, renderer, color, 0, FONTSIZE);
 
 
-        SDL_RenderPresent(renderer);
+                create = false;
+            }
 
 
-        SDL_Delay(0.3f);
+            startMenu(&start, event, renderer, window, ship, acc, friction, startText, highScoreText, highScores, highScoreNumbers, &isRunning, &create, points);
+        }
 
+        if(!isRunning){
+
+            return 0;
+
+        }
         
         collisionHandler(
             ship, 
@@ -198,8 +177,45 @@ int main(int argv, char** args)
             highScores
         );
 
+
+
+
+
+
+   
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+               
+
+
+        spawnContinuousAsteroids(asteroids, renderer, 0.1f, 0.05f, &currentAsteroidAmount, MAXASTEROIDAMOUNT, SCREENW, SCREENH, &totalAsteroidAmount);
+        
+
+
+        SDL_RenderClear(renderer);
+
+
+        
+        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
+       
+        shipHandler(ship, renderer, event, window, acc, friction);
+        bulletHandler(bullets, &currentBulletAmount, &shot, renderer, ship);
+
+        printScore(score);
+
+
+        SDL_RenderPresent(renderer);
+
+
+        SDL_Delay(0.3f);
+
+        
+
+
     
     }
+
+    return 0;
 
 
 }
@@ -207,7 +223,7 @@ int main(int argv, char** args)
 void writeFile(int *highScoreNumbers){
 
     FILE *fp;
-    fp = fopen("C:/Cprogram/Lab2/Lab2Hard/highscores", "wb");
+    fp = fopen("./highscores", "wb");
     if(fp == NULL){
         printf("Could not open file of name highscores\n");
         exit(EXIT_FAILURE);
@@ -226,7 +242,7 @@ void writeFile(int *highScoreNumbers){
 void readFile(Score **highScores, SDL_Renderer *renderer, SDL_Color color, int *highScoreNumbers){
     
     FILE *fp;
-    fp = fopen("C:/Cprogram/Lab2/Lab2Hard/highscores", "rb");
+    fp = fopen("./highscores", "rb");
 
     if(fp != NULL){
         
@@ -235,7 +251,7 @@ void readFile(Score **highScores, SDL_Renderer *renderer, SDL_Color color, int *
         {
 
             fread(&highScoreNumbers[i], sizeof(int), MAXHIGHSCORE, fp);
-            highScores[i] = createScore(SCREENW / 2, 50 * i, renderer, color, highScoreNumbers[i], FONTSIZE - 10);
+            highScores[i] = createScore(SCREENW / 2, 50 * i + 75, renderer, color, highScoreNumbers[i], FONTSIZE - 10);
             
         }
     
@@ -296,7 +312,7 @@ void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRu
     updateHighScore(highScoreNumbers, points, highscores);
 
     writeFile(highScoreNumbers);
-    deleteShip(ship);
+    // deleteShip(ship);
     *isRunning = false;
 
     SDL_DestroyRenderer(renderer);
@@ -334,13 +350,15 @@ void restart(Ship *ship, int *currentAsteroidAmount, int *currentBulletAmount, i
 
 }
 
-void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, Score **highScores, int *highScoreNumbers, bool *isRunning, bool *created, float points){
+void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Window *window, Ship *ship, float acc, float friction, Text *startText, Text *highScoreText, Score **highScores, int *highScoreNumbers, bool *isRunning, bool *created, float points){
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     SDL_RenderClear(renderer);
 
     printText(startText);
+    printText(highScoreText);
+
 
     for (int i = 0; i < MAXHIGHSCORE; i++)
     {
@@ -405,7 +423,8 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
 void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction){
 
     
-  
+   
+    
     const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
     if(keyboard_state_array[SDL_SCANCODE_SPACE])
     {
@@ -498,12 +517,8 @@ void bulletHandler(Bullet **bullets, int *currentBulletAmount, bool *shot, SDL_R
 void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int *currentasteroidAmount)
 {
 
-    // printf("Hello World\n");
     for (int i = 0; i < *currentasteroidAmount; i++)
     {   
-
-        // printf("Hello World");
-        // printf("%s\n", getAstName(asteroids[i]));
 
         updateAsteroid(asteroids, currentasteroidAmount, i);
 
