@@ -56,9 +56,6 @@ Asteroid *createAsteroid(float x, float y, float vel, double angle, int screenW,
     sprintf(str, "ast%d", *totalAsteroidAmount);
 
     strcpy(ast->name, str);
-
-
-    // puts(ast->name);
  
 
     ast->boundingX = ast->boundingY = 0;
@@ -111,7 +108,6 @@ void spawnContinuousAsteroids(Asteroid **asteroids, SDL_Renderer *renderer, floa
 
     if(*currentAsteroidAmount < maxAsteroidAmount){
 
-        // printf("%d, %d\n", maxAsteroidAmount, *currentAsteroidAmount);
         float pos[] = {windowW / 2, windowH / 2}, vel = 0;
         int boundingX = 1100, boundingY = 900;
         double angle = 0, randAngle = 0;
@@ -163,12 +159,6 @@ void splitAsteroid(Asteroid *ast, Asteroid **asteroids, int *currentAsteroidAmou
     }
 
 
-    // for (int i = 0; i < *currentAsteroidAmount; i++)
-    // {
-
-    //     puts(asteroids[i]->name);
-
-    // }
     
 
 
@@ -210,14 +200,11 @@ void updateAsteroid(Asteroid **asteroids, int *currentAsteroidAmount, int delete
         return;
     }
 
-    // printf("%d, %d\n", *currentAsteroidAmount, deleteIndex);
     
 
     if(outsideBounds(asteroids[deleteIndex]->x, asteroids[deleteIndex]->y, asteroids[deleteIndex]->screenW, asteroids[deleteIndex]->screenH, 500)){
 
-        // updateAsteroidArray(asteroids, deleteIndex, *currentAsteroidAmount);
         destroyAsteroid(asteroids[deleteIndex], asteroids, deleteIndex, currentAsteroidAmount);
-        // (*currentAsteroidAmount)--;
 
         return;
 

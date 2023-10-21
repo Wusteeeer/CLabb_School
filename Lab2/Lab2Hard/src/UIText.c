@@ -35,8 +35,6 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
 
     score->points = points;
 
-    printf("%.2f\n", score->points);
-
     score->font = TTF_OpenFont("./PixelFont.ttf", fontSize);
 
     if(!score->font){
@@ -44,13 +42,13 @@ Score *createScore(float x, float y, SDL_Renderer *renderer, SDL_Color color, fl
         return NULL;
     }
 
-    createScoreTexture(score, score->points);
+    // createScoreTexture(score, score->points);
 
  
-    if(!score->texture){
-        printf("%s\n", SDL_GetError());
-        return NULL;
-    }
+    // if(!score->texture){
+    //     printf("%s\n", SDL_GetError());
+    //     return NULL;
+    // }
 
     return score;
 
@@ -81,20 +79,12 @@ void createScoreTexture(Score *score, int points){
 
 }
 
-void printScore(Score *score){
-    
-    if(score != NULL)
-        SDL_RenderCopyEx(score->renderer, score->texture, NULL, &(score->rect), 0, NULL, SDL_FLIP_NONE);
-
+void printScore(Score *score)
+{
+    SDL_RenderCopyEx(score->renderer, score->texture, NULL, &(score->rect), 0, NULL, SDL_FLIP_NONE);
+  
 }
 
-void changeScore(Score *score, float points){
-    
-    score->points += points;
-
-    createScoreTexture(score, score->points);
-    
-}
 
 void setScore(Score *score, float points){
     
@@ -130,21 +120,29 @@ Text *createText(float x, float y, SDL_Renderer *renderer, char str[], int fontS
 
     Text *text = malloc(sizeof(struct text));
 
+
     text->rect.x = x;
     text->rect.y = y;
 
     text->renderer = renderer;
 
     text->color = color;
+
+ 
+
     text->font = TTF_OpenFont("./PixelFont.ttf", fontSize);
+ 
+
 
     if(!text->font){
+        printf("%s", SDL_GetError());
         return NULL;
     }
     
     createTextTexture(text, str);
 
     if(!text->texture){
+        printf("%s", SDL_GetError());
         return NULL;
     }
 
@@ -182,9 +180,8 @@ void createTextTexture(Text *text, char str[]){
 
 void printText(Text *text){
 
-    if(text != NULL)
-        SDL_RenderCopyEx(text->renderer, text->texture, NULL, &(text->rect), 0, NULL, SDL_FLIP_NONE);
-
+    SDL_RenderCopyEx(text->renderer, text->texture, NULL, &(text->rect), 0, NULL, SDL_FLIP_NONE);
+        
 
 }
 

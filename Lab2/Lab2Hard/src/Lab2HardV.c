@@ -17,10 +17,7 @@
 #define SCREENH 700
 #define MAXHIGHSCORE 5
 
-//TODO: Migh have fixed the crashing but more testing is needed
-//if time: make it juicy
-
-void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction);
+void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction, bool *isRunning, int *highScoreNumbers, float points, Score **highScores);
 
 void asteroidHandler(Asteroid **asteroids, SDL_Renderer *renderer, int *currentasteroidAmount);
 
@@ -69,12 +66,12 @@ int main(int argv, char** args)
     #pragma endregion
 
     bool start = false;
-    bool isRunning = true;
     bool create = true;
-    SDL_Color color = {255, 255, 255};
+    bool isRunning = true;
+
+    SDL_Color color = {255, 255, 255, 255};
 
     Asteroid *asteroids[100];
-    initAstArr(asteroids, 100);
 
     int currentAsteroidAmount = 0;
     int totalAsteroidAmount = 0;
@@ -89,77 +86,83 @@ int main(int argv, char** args)
 
     Text *startText;
     Text *highScoreText;
-    Score *score, *highScores[MAXHIGHSCORE];
+    Score *score, *highScores[25];
 
-    int *highScoreNumbers = malloc(sizeof(int) * MAXHIGHSCORE);
+    int *highScoreNumbers = malloc(sizeof(int) * 25);
     for (int i = 0; i < MAXHIGHSCORE; i++)
     {
         highScoreNumbers[i] = 0;
+        highScores[i] = createScore(SCREENW / 2 - 10, 50 * i + 75, renderer, color, 0, FONTSIZE - 10);
+        setScore(highScores[i], 0);
+
     }
     
 
     
     float points = 0;
 
+    startText = createText(SCREENW / 2 - 175, SCREENH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
 
 
+
+    highScoreText = createText(SCREENW / 2 - 80, 0, renderer, "Highscores:", FONTSIZE - 10, color);
+
+    score = createScore(SCREENW / 2, 10, renderer, color, 0, FONTSIZE);
+    setScore(score, 0);
+
+    
     readFile(highScores, renderer, color, highScoreNumbers);
 
-  
-    
     while(isRunning)
     {
-
-        while (SDL_PollEvent(&event))
-        {
-
-            
-
-            switch (event.type){
-                case SDL_QUIT:
-
-                    gameOver(renderer, window, ship, &isRunning, highScoreNumbers, points, highScores);
-                    return 0;
-
-                break;
-                case SDL_KEYDOWN:
-
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                    {
-                        gameOver(renderer, window, ship, &isRunning, highScoreNumbers, points, highScores);
-                        return 0;
-                    }            
-                    
-                    
-                break;
-
-            }
-        
-        }
+                
 
         while(!start){  
 
-            if(create){
-                
-                
-                startText = createText(SCREENW / 2 - 175, SCREENH / 2 + 100, renderer, "Press [SPACE] to start", FONTSIZE - 10, color);    
-                highScoreText = createText(SCREENW / 2 - 40, 0, renderer, "Highscores:", FONTSIZE - 10, color);
-
-                score = createScore(SCREENW / 2, 10, renderer, color, 0, FONTSIZE);
+        
+            startMenu(&start, event, renderer, window, ship, acc, friction, startText, highScoreText, highScores, highScoreNumbers, &isRunning, &create, points);
+            
 
 
-                create = false;
+            if(!isRunning){
+                return 0;
             }
 
-
-            startMenu(&start, event, renderer, window, ship, acc, friction, startText, highScoreText, highScores, highScoreNumbers, &isRunning, &create, points);
         }
 
-        if(!isRunning){
 
-            return 0;
 
-        }
+   
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+               
+
+
+        spawnContinuousAsteroids(asteroids, renderer, 0.1f, 0.05f, &currentAsteroidAmount, MAXASTEROIDAMOUNT, SCREENW, SCREENH, &totalAsteroidAmount);
+        
+
+
+        SDL_RenderClear(renderer);
+
+
+        
+        
+       
+        bulletHandler(bullets, &currentBulletAmount, &shot, renderer, ship);
+        
+
+
+        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
+
+        shipHandler(ship, renderer, event, window, acc, friction, &isRunning, highScoreNumbers, points, highScores);
+
+        printScore(score);
+        
+        SDL_RenderPresent(renderer);
+
+
+        SDL_Delay(0.3f);
+
         
         collisionHandler(
             ship, 
@@ -182,36 +185,6 @@ int main(int argv, char** args)
 
 
 
-   
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-               
-
-
-        spawnContinuousAsteroids(asteroids, renderer, 0.1f, 0.05f, &currentAsteroidAmount, MAXASTEROIDAMOUNT, SCREENW, SCREENH, &totalAsteroidAmount);
-        
-
-
-        SDL_RenderClear(renderer);
-
-
-        
-        
-       
-        shipHandler(ship, renderer, event, window, acc, friction);
-        bulletHandler(bullets, &currentBulletAmount, &shot, renderer, ship);
-        
-
-        printScore(score);
-
-        asteroidHandler(asteroids, renderer, &currentAsteroidAmount);
-        SDL_RenderPresent(renderer);
-
-
-        SDL_Delay(0.3f);
-
-        
-
 
     
     }
@@ -227,6 +200,7 @@ void writeFile(int *highScoreNumbers){
     fp = fopen("./highscores", "wb");
     if(fp == NULL){
         printf("Could not open file of name highscores\n");
+        fclose(fp);
         exit(EXIT_FAILURE);
     }
 
@@ -252,27 +226,19 @@ void readFile(Score **highScores, SDL_Renderer *renderer, SDL_Color color, int *
         {
 
             fread(&highScoreNumbers[i], sizeof(int), MAXHIGHSCORE, fp);
-            highScores[i] = createScore(SCREENW / 2, 50 * i + 75, renderer, color, highScoreNumbers[i], FONTSIZE - 10);
-            
+
+            setScore(highScores[i], highScoreNumbers[i]);
         }
-    
 
-        printf("No file existed\n");
-        return;
-    }
-
-    for (int i = 0; i < MAXHIGHSCORE; i++)
-    {
-        highScores[i] = createScore(SCREENW / 2, 50 * i + 75, renderer, color, 0, FONTSIZE - 10);
     }
 
     fclose(fp);
+
 
 }
 
 void updateHighScore(int *highScoreNumbers, int points, Score **highscores){
 
-    printf("\n");
     for (int i = 0; i < MAXHIGHSCORE; i++)
     {  
 
@@ -288,6 +254,7 @@ void updateHighScore(int *highScoreNumbers, int points, Score **highscores){
 
             highScoreNumbers[i] = points;
             
+
             break;
         }
     }
@@ -297,11 +264,8 @@ void updateHighScore(int *highScoreNumbers, int points, Score **highscores){
     {
        
        setScore(highscores[i], highScoreNumbers[i]);
-       printf("%d\n", highScoreNumbers[i]);
     }
     
-
-    printf("\n");
     
 
 }
@@ -309,7 +273,7 @@ void updateHighScore(int *highScoreNumbers, int points, Score **highscores){
 void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRunning, int *highScoreNumbers, float points, Score **highscores){
 
   
-    
+    deleteShip(ship);    
     updateHighScore(highScoreNumbers, points, highscores);
 
     writeFile(highScoreNumbers);
@@ -324,16 +288,18 @@ void gameOver(SDL_Renderer *renderer, SDL_Window *window, Ship *ship, bool *isRu
 void restart(Ship *ship, int *currentAsteroidAmount, int *currentBulletAmount, int *totalAsteroidAmount, Bullet **bullets, Asteroid **asteroids, Score *score, bool *started, float points, int *highscoreNumbers, Score **highscores){
 
     updateHighScore(highscoreNumbers, points, highscores);
+    writeFile(highscoreNumbers);
 
-    for (int i = 0; i < *currentAsteroidAmount; i++)
+    for (int i = *currentAsteroidAmount - 1; i >= 0; i--)
     {
+
         destroyAsteroid(asteroids[i], asteroids, i, currentAsteroidAmount);
     }
 
     (*totalAsteroidAmount) = 0;
     (*currentAsteroidAmount) = 0;
     
-    for (int i = 0; i < *currentBulletAmount; i++)
+    for (int i = *currentBulletAmount - 1; i >= 0; i--)
     {
         deleteBullet(bullets[i]);
         updateBulletArray(bullets, i, *currentBulletAmount);
@@ -342,10 +308,9 @@ void restart(Ship *ship, int *currentAsteroidAmount, int *currentBulletAmount, i
 
     setPosition(ship, SCREENW / 2, SCREENH / 2);
     stopShip(ship);
-    destroyScore(score);
 
+    setScore(score, 0);
     *started = false;
-    
 
 
 }
@@ -362,7 +327,9 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
 
     for (int i = 0; i < MAXHIGHSCORE; i++)
     {
+        
         printScore(highScores[i]);
+
     }
     
 
@@ -386,7 +353,6 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
                 }
 
                 if(event.key.keysym.sym == SDLK_SPACE){
-                    destroyText(startText);
                     *created = true;
                     *started = true;
                     return;
@@ -420,9 +386,34 @@ void startMenu(bool *started, SDL_Event event, SDL_Renderer *renderer, SDL_Windo
 
 }
 
-void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction){
+void shipHandler(Ship *ship, SDL_Renderer *renderer, SDL_Event event, SDL_Window *window, float acc, float friction, bool *isRunning, int *highScoreNumbers, float points, Score **highScores){
 
+    while (SDL_PollEvent(&event))
+    {
+
+        
+
+        switch (event.type){
+            case SDL_QUIT:
+
+                gameOver(renderer, window, ship, isRunning, highScoreNumbers, points, highScores);
+                return;
+
+            break;
+            case SDL_KEYDOWN:
+
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    gameOver(renderer, window, ship, isRunning, highScoreNumbers, points, highScores);
+                    return;
+                }            
+                
+                
+            break;
+
+        }
     
+    }   
    
     
     const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
@@ -569,8 +560,8 @@ void collisionHandler(Ship *ship, Bullet **bullets, Asteroid **asteroids, Score 
                 SDL_Rect asteroidRect = getAstRect(asteroids[i]);
 
 
-                changeScore(score, 100.0f - asteroidRect.w);
                 (*points) += 100.0f - asteroidRect.w;
+                setScore(score, *points);
 
                 deleteBullet(bullets[j]);
                 updateBulletArray(bullets, j, *currentBulletAmount);
